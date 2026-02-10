@@ -23,8 +23,7 @@ BASE_DIR = get_base_dir()
 
 # Cargar .env desde el directorio del ejecutable
 env_path = BASE_DIR / ".env"
-if env_path.exists():
-    load_dotenv(env_path)
+load_env_local(env_path)
 
 # Rutas de directorios a limpiar
 CONFIG = {
