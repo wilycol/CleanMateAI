@@ -1,146 +1,81 @@
-# CleanMateAI - Sistema de Limpieza Automática
+# ✨ CleanMate AI - Optimización Nativa con Inteligencia Artificial
 
-Sistema de limpieza automática para Windows que elimina archivos temporales, cachés de navegador y logs antiguos de forma programada.
+![CleanMate AI Logo](web/assets/logo.svg)
 
-## Características
+> **"Tu PC más inteligente, rápido y seguro."**
 
-- 🧹 **Limpieza de archivos temporales** del sistema y usuario
-- 🌐 **Limpieza de caché** de múltiples navegadores (Chrome, Firefox, Edge, Brave)
-- 📋 **Limpieza de logs** antiguos y archivos de caché de Internet
-- ⏰ **Programación semanal** configurable (por defecto: Domingos a las 3:00 AM)
-- 📊 **Registro detallado** de todas las operaciones realizadas
-- 🔒 **Modo simulación** para probar sin eliminar archivos
-- 🚫 **Exclusión de carpetas** del sistema críticas
+**CleanMate AI** no es solo otro limpiador de archivos. Es un **agente de mantenimiento autónomo** potenciado por **Grok AI** que entiende el contexto de tu sistema Windows. Combina algoritmos de limpieza profunda con diagnósticos predictivos de Inteligencia Artificial para mantener tu equipo en estado óptimo sin intervención humana.
 
-## Requisitos
+---
 
-- Python 3.7 o superior
-- Windows 10/11
-- Permisos de administrador (recomendado para limpieza completa)
+## 🚀 Características Principales
 
-## Instalación
+### 🧠 Inteligencia Artificial Nativa
+- **Diagnóstico Contextual:** Analiza logs y patrones de uso para sugerir optimizaciones reales, no genéricas.
+- **Consultas a Grok:** Integración directa con la API de Grok (xAI) para interpretar errores del sistema y ofrecer soluciones en lenguaje natural.
 
-1. Clona o descarga este repositorio:
-   ```
-   git clone https://github.com/tuusuario/CleanMateAI.git
+### 🛡️ Seguridad "Safe-Core"
+- **Integridad Garantizada:** NUNCA elimina un archivo sin validación previa.
+- **Modo Simulación (Dry-Run):** Previsualiza exactamente qué bytes se liberarán antes de tocar el disco.
+- **Protección de Datos:** Limpia cachés de navegadores (Chrome, Edge, Brave, Firefox) preservando cookies de sesión y contraseñas.
+
+### ⚡ Rendimiento Adaptativo
+- **Limpieza Profunda:** Elimina temporales, logs antiguos, volcados de memoria y residuos de actualizaciones de Windows.
+- **Backend Proxy Seguro:** Arquitectura moderna con servidor intermedio para proteger tus claves de API.
+- **Monitorización de Recursos:** Vigila CPU y RAM en tiempo real para ejecutar tareas pesadas solo cuando el PC está inactivo.
+
+---
+
+## 🛠️ Instalación y Uso
+
+### Opción A: Usuario Final (Recomendado)
+Simplemente descarga el ejecutable portable desde nuestra web o la sección de [Releases](https://github.com/TU_USUARIO/CleanMateAI/releases).
+1. Ejecuta `CleanMateAI.exe`.
+2. El agente analizará tu sistema y esperará tu confirmación.
+
+### Opción B: Desarrolladores (Código Fuente)
+
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/TU_USUARIO/CleanMateAI.git
    cd CleanMateAI
    ```
 
-2. (Opcional) Crea un entorno virtual:
-   ```
+2. **Crear entorno virtual (Opcional pero recomendado):**
+   ```bash
    python -m venv venv
-   venv\Scripts\activate
+   .\venv\Scripts\activate
    ```
 
-3. No se requieren dependencias adicionales (solo Python estándar).
-
-## Uso
-
-### Ejecución básica
-
-```bash
-# Ejecutar limpieza inmediatamente
-python cleanmate.py
-
-# Modo simulación (muestra qué se eliminaría sin borrar)
-python cleanmate.py --dry-run
-
-# Ejecutar una sola limpieza y salir
-python cleanmate.py --once
-
-# Iniciar programador semanal (se ejecuta en segundo plano)
-python cleanmate.py --schedule
-
-# Ver estado del scheduler
-python cleanmate.py --status
-```
-
-### Programar en Windows Task Scheduler
-
-Para programar la limpieza automáticamente cada semana:
-
-1. Ejecuta el script de configuración como administrador:
-   ```
-   setup_task.bat
+3. **Instalar dependencias:**
+   ```bash
+   pip install -r requirements.txt
    ```
 
-2. O manualmente, crea una tarea programada:
+4. **Ejecutar en modo desarrollo:**
+   ```bash
+   python cleanmate.py --dry-run
    ```
-   schtasks /create /tn "CleanMateAI" /tr "python cleanmate.py --schedule" /sc weekly /d SUN /st 03:00
-   ```
 
-## Configuración
+---
 
-Edita el archivo `config.py` para personalizar:
+## 🏗️ Arquitectura del Proyecto
 
-```python
-# Días de antigüedad para eliminar archivos
-"max_age_days": 7,
+El sistema consta de tres pilares fundamentales:
 
-# Programación semanal (0=Lunes, 6=Domingo)
-"schedule_day": 6,  # Domingo
-"schedule_hour": 3,  # 3:00 AM
+1.  **Core (Python):** Scripts modulares (`cleanmate.py`, `temp_cleaner.py`) que interactúan con la API de Windows.
+2.  **Backend (Flask):** Un servidor proxy (`backend/server.py`) que gestiona las peticiones a la IA de forma segura.
+3.  **Frontend (Web):** Landing page estática (`web/index.html`) para distribución y documentación.
 
-# Modo simulación
-"dry_run": False,
-```
+---
 
-## Estructura del Proyecto
+## 🤝 Contribuir
+Este proyecto es de código abierto. Si tienes ideas para mejorar la heurística de limpieza o nuevos prompts para la IA:
+1. Haz un Fork.
+2. Crea una rama (`git checkout -b feature/nueva-idea`).
+3. Envía un Pull Request.
 
-```
-CleanMateAI/
-├── cleanmate.py           # Script principal
-├── config.py              # Configuración
-├── logger.py              # Sistema de registro
-├── temp_cleaner.py        # Limpieza de archivos temporales
-├── browser_cache_cleaner.py  # Limpieza de caché de navegadores
-├── log_cleaner.py         # Limpieza de logs
-├── scheduler.py           # Programador semanal
-├── setup_task.bat         # Script para Windows Task Scheduler
-├── cleanup_log.txt        # Registro de limpiezas
-├── logs/                  # Directorio de logs de la app
-└── README.md              # Este archivo
-```
+---
 
-## Funcionalidades Detalladas
-
-### Archivos Temporales
-- Limpia `%TEMP%` y `AppData\Local\Temp`
-- Elimina archivos con extensiones: `.tmp`, `.temp`, `.log`, `.old`, `.bak`, etc.
-- Considera la antigüedad configurada
-
-### Caché de Navegadores
-- **Chrome**: `AppData\Local\Google\Chrome\...\Cache`
-- **Firefox**: `AppData\Local\Mozilla\Firefox\Profiles\...\cache2`
-- **Edge**: `AppData\Local\Microsoft\Edge\...\Cache`
-- **Brave**: `AppData\Local\BraveSoftware\...\Cache`
-
-### Logs
-- Directorio de logs de la aplicación
-- Caché de Internet Explorer/Edge
-- Archivos `.log`, `.txt`, `.old` antiguos
-
-## Registro (Logging)
-
-Todas las limpiezas se registran en `cleanup_log.txt` con:
-- Fecha y hora de la operación
-- Tipo de archivo eliminado
-- Ruta completa
-- Tamaño del archivo
-- Espacio total liberado
-
-## Seguridad
-
-- ✅ Excluye carpetas del sistema críticas
-- ✅ Modo simulación para pruebas
-- ✅ Confirmación antes de eliminar
-- ✅ Registro de todas las operaciones
-- ⚠️ Requiere permisos de administrador para limpiar directorios del sistema
-
-## Licencia
-
-MIT License - Libre para usar y modificar.
-
-## Contribuciones
-
-¡Las contribuciones son bienvenidas! Por favor, abre un issue o pull request.
+**Desarrollado con ❤️ y 🤖 por [Tu Nombre/Equipo]**
+*Versión 1.0.0 | Compatible con Windows 10/11*
