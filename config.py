@@ -91,9 +91,11 @@ LOGGING_CONFIG = {
 # Obtén tu API key en: https://console.x.ai/
 # Se puede configurar mediante variable de entorno XAI_API_KEY
 GROK_CONFIG = {
-    "api_key": os.environ.get("XAI_API_KEY", ""),
+    "api_key": os.environ.get("XAI_API_KEY", "proxy-mode"), # Valor dummy para modo proxy
     "model": "grok-beta",
-    "api_url": "https://api.x.ai/v1/chat/completions",
+    # "api_url": "https://api.x.ai/v1/chat/completions", # URL Directa (Desarrollo)
+    "api_url": "https://cleanmateai-backend.onrender.com/api/analyze", # URL Proxy (Producción)
+    "use_proxy": True, # Activar modo proxy para seguridad
     "timeout": 30,
     "max_tokens": 500,
 }

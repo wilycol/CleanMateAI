@@ -89,7 +89,8 @@ Si hay problemas, sugiere acciones específicas."""
             return f"⚠️ CleanMateAI (Free): {message}\n\nUpgrade a Premium para llamadas ilimitadas."
         
         with self._lock:
-            if not self.is_configured():
+            # En modo proxy, no necesitamos API Key local
+            if not GROK_CONFIG.get("use_proxy", False) and not self.is_configured():
                 self.last_error = "API key no configurada"
                 return "⚠️ CleanMateAI: API de Grok no configurada. Establece la variable de entorno XAI_API_KEY."
             
@@ -98,54 +99,72 @@ Si hay problemas, sugiere acciones específicas."""
             if not can_call_inner:
                 self.last_error = "Límite de llamadas alcanzado"
                 return f"⚠️ CleanMateAI (Free): {message_inner}\n\nUpgrade a Premium para llamadas ilimitadas."
-            
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.api_key}"
-            }
-            
-            messages = [
-                {"role": "system", "content": self.build_system_prompt()},
-                {"role": "user", "content": self.build_user_prompt(system_info, cleanup_info)}
-            ]
-            
-            payload = {
-                "messages": messages,
-                "model": self.model,
-                "max_tokens": self.max_tokens,
-                "temperature": 0.7
-            }
-            
+
             try:
-                response = requests.post(
-                    self.api_url,
-                    headers=headers,
-                    json=payload,
-                    timeout=self.timeout
-                )
-                response.raise_for_status()
+                # MODO PROXY: Enviar datos crudos al backend seguro
+                if GROK_CONFIG.get("use_proxy", False):
+                    payload = {
+                        "system_info": system_info,
+                        "cleanup_info": cleanup_info
+                    }
+                    # No se necesitan headers de autenticación para el proxy público (el proxy maneja la seguridad)
+                    headers = {
+                        "Content-Type": "application/json"
+                    }
+                    response = requests.post(
+                        self.api_url, 
+                        json=payload, 
+                        headers=headers, 
+                        timeout=self.timeout
+                    )
+
+                # MODO DIRECTO: Construir prompt y hablar con xAI directamente (Dev/Legacy)
+                else:
+                    user_prompt = self.build_user_prompt(system_info, cleanup_info)
+                    
+                    payload = {
+                        "model": self.model,
+                        "messages": [
+                            {"role": "system", "content": self.build_system_prompt()},
+                            {"role": "user", "content": user_prompt}
+                        ],
+                        "max_tokens": self.max_tokens,
+                        "temperature": 0.7
+                    }
+                    
+                    headers = {
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {self.api_key}"
+                    }
+                    
+                    response = requests.post(
+                        self.api_url, 
+                        json=payload, 
+                        headers=headers, 
+                        timeout=self.timeout
+                    )
                 
-                data = response.json()
-                content = data["choices"][0]["message"]["content"]
-                self.last_response = content
-                self.last_error = ""
-                
-                # Registrar la llamada exitosa
-                record_api_call()
-                
-                return f"🤖 CleanMateAI:\n\n{content}"
-                
-            except requests.exceptions.Timeout:
-                self.last_error = "Timeout al conectar con la API"
-                return "⚠️ CleanMateAI: Timeout al conectar con Grok. Intentaré más tarde."
-                
-            except requests.exceptions.RequestException as e:
-                self.last_error = f"Error de conexión: {str(e)}"
-                return f"⚠️ CleanMateAI: Error de conexión con Grok: {str(e)}"
-                
-            except (KeyError, json.JSONDecodeError) as e:
-                self.last_error = f"Error al procesar respuesta: {str(e)}"
-                return "⚠️ CleanMateAI: Error al procesar respuesta de Grok."
+                # Procesar respuesta (común para ambos modos si el proxy devuelve estructura OpenAI o similar)
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # El proxy puede devolver directamente la respuesta de Grok
+                    if "choices" in data:
+                        content = data["choices"][0]["message"]["content"]
+                        self.last_response = content
+                        record_api_call()  # Registrar llamada exitosa
+                        return content
+                    else:
+                        # Fallback si la estructura es diferente
+                        return str(data)
+                else:
+                    error_msg = f"Error {response.status_code}: {response.text}"
+                    self.last_error = error_msg
+                    return f"⚠️ Error de conexión con IA: {response.status_code}"
+                    
+            except Exception as e:
+                self.last_error = str(e)
+                return f"⚠️ Error interno: {str(e)}"
     
     def analyze_async(self, system_info: Dict[str, Any], cleanup_info: Dict[str, Any], 
                       callback=None) -> threading.Thread:

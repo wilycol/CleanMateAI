@@ -29,7 +29,7 @@
 ## 🛠️ Instalación y Uso
 
 ### Opción A: Usuario Final (Recomendado)
-Simplemente descarga el ejecutable portable desde nuestra web o la sección de [Releases](https://github.com/TU_USUARIO/CleanMateAI/releases).
+Simplemente descarga el ejecutable portable desde nuestra web o la sección de [Releases](https://github.com/wilycol/CleanMateAI/releases).
 1. Ejecuta `CleanMateAI.exe`.
 2. El agente analizará tu sistema y esperará tu confirmación.
 
@@ -37,7 +37,7 @@ Simplemente descarga el ejecutable portable desde nuestra web o la sección de [
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone https://github.com/TU_USUARIO/CleanMateAI.git
+   git clone https://github.com/wilycol/CleanMateAI.git
    cd CleanMateAI
    ```
 
