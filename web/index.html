@@ -3,39 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CleanMate AI - Mantenimiento Inteligente para Windows</title>
+    <title>CleanMate AI - Optimización con Inteligencia Artificial Nativa</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <style>
         :root {
             --primary: #2563eb;
-            --dark: #1e293b;
+            --dark: #0f172a;
             --light: #f8fafc;
-            --accent: #3b82f6;
+            --accent: #0ea5e9;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--light);
-            color: var(--dark);
+            color: #334155;
             line-height: 1.6;
         }
         header {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
             color: white;
-            padding: 4rem 2rem;
+            padding: 5rem 2rem;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Efecto de red neuronal de fondo sutil */
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.3;
+        }
+        .logo-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
         h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 1rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .subtitle {
             font-size: 1.5rem;
-            color: #94a3b8;
-            margin-bottom: 2rem;
+            color: #e2e8f0;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .ai-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.9rem;
+            color: #93c5fd;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 2rem;
         }
@@ -94,37 +138,41 @@
 <body>
 
     <header>
-        <div class="container">
+        <div class="container" style="position: relative; z-index: 2;">
+            <div class="logo-container">
+                <img src="assets/logo.svg" alt="CleanMate AI Logo" width="120" height="120">
+            </div>
+            <div class="ai-badge">✨ Potenciado por Grok AI</div>
             <h1>CleanMate AI</h1>
-            <p class="subtitle">Tu PC más rápido, limpio e inteligente.</p>
+            <p class="subtitle">Optimización de Windows con Inteligencia Artificial Nativa. Diagnóstico predictivo y limpieza autónoma.</p>
             <a href="https://github.com/TU_USUARIO/CleanMateAI/releases/latest/download/CleanMateAI.exe" class="btn-download">
-                📥 Descargar para Windows
+                📥 Descargar Agente Inteligente (.exe)
             </a>
-            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">Versión 1.0.0 | Windows 10/11 | Gratuito</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.7;">Versión 1.0.0 | Compatible con Windows 10/11</p>
         </div>
     </header>
 
     <div class="container">
         <div class="features">
             <div class="feature-card">
-                <div class="feature-icon">🧹</div>
-                <h3>Limpieza Profunda</h3>
-                <p>Elimina archivos basura, temporales y residuos que ralentizan tu sistema sin tocar tus archivos importantes.</p>
+                <div class="feature-icon">🧠</div>
+                <h3>Inteligencia Nativa</h3>
+                <p>No son scripts simples. CleanMate AI utiliza algoritmos de aprendizaje para entender los patrones de uso de tu PC y optimizar recursos.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🤖</div>
-                <h3>Potenciado por IA</h3>
-                <p>Analiza la salud de tu PC con Inteligencia Artificial (Grok) y recibe consejos personalizados para optimizar el rendimiento.</p>
+                <div class="feature-icon">🔬</div>
+                <h3>Diagnóstico Profundo</h3>
+                <p>Analiza la salud del sistema en tiempo real (CPU, RAM, Disco) y toma decisiones autónomas para prevenir cuellos de botella.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🛡️</div>
-                <h3>Seguridad Primero</h3>
-                <p>Modo "Simulación" incluido para verificar qué se eliminará antes de hacerlo. Código abierto y transparente.</p>
+                <h3>Integridad Garantizada</h3>
+                <p>Cada decisión de limpieza es validada. El modo "Safe-Core" asegura que tus archivos críticos nunca sean tocados.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🌐</div>
-                <h3>Privacidad Total</h3>
-                <p>Limpia cachés de navegadores (Chrome, Edge, Firefox, Brave) protegiendo tu historial y datos personales.</p>
+                <div class="feature-icon">⚡</div>
+                <h3>Rendimiento Adaptativo</h3>
+                <p>Libera espacio y memoria caché de navegadores inteligentemente, aprendiendo qué archivos son basura y cuáles son útiles para ti.</p>
             </div>
         </div>
 
