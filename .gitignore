@@ -1,0 +1,15 @@
+# Entorno Python
+venv/
+__pycache__/
+*.py[cod]
+.env
+
+# Distribución
+build/
+dist/
+*.spec
+*.exe
+
+# Logs y Temporales
+*.log
+cleanup_log.txt

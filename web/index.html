@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleanMate AI - Mantenimiento Inteligente para Windows</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --accent: #3b82f6;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .subtitle {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .btn-download {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        }
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.4);
+            background-color: #1d4ed8;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+        }
+        .github-link {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>CleanMate AI</h1>
+            <p class="subtitle">Tu PC más rápido, limpio e inteligente.</p>
+            <a href="https://github.com/TU_USUARIO/CleanMateAI/releases/latest/download/CleanMateAI.exe" class="btn-download">
+                📥 Descargar para Windows
+            </a>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">Versión 1.0.0 | Windows 10/11 | Gratuito</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🧹</div>
+                <h3>Limpieza Profunda</h3>
+                <p>Elimina archivos basura, temporales y residuos que ralentizan tu sistema sin tocar tus archivos importantes.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>Potenciado por IA</h3>
+                <p>Analiza la salud de tu PC con Inteligencia Artificial (Grok) y recibe consejos personalizados para optimizar el rendimiento.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Seguridad Primero</h3>
+                <p>Modo "Simulación" incluido para verificar qué se eliminará antes de hacerlo. Código abierto y transparente.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3>Privacidad Total</h3>
+                <p>Limpia cachés de navegadores (Chrome, Edge, Firefox, Brave) protegiendo tu historial y datos personales.</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 4rem; text-align: center;">
+            <h2>¿Cómo funciona?</h2>
+            <p style="font-size: 1.1rem; max-width: 600px; margin: 1rem auto;">
+                CleanMate AI es una aplicación portable. Simplemente descárgala, ejecútala y deja que optimice tu sistema. 
+                Sin instalaciones complejas ni publicidad intrusiva.
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Desarrollado con ❤️ por <a href="#" class="github-link">Wily devs</a></p>
+        <p>CleanMate AI es software libre bajo licencia MIT.</p>
+    </footer>
+
+</body>
+</html>
