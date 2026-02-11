@@ -88,38 +88,49 @@ async function scanDirectory(dirPath) {
     return { files, size };
 }
 
-async function analyzeSystem() {
+async function analyzeSystem(onProgress) {
     log.info('Starting system analysis...');
     const paths = getPathsToClean();
     let totalSize = 0;
     let filesToDelete = [];
     let readOnlyFiles = [];
+    let scannedCount = 0;
 
     for (const p of paths) {
-        // We need a recursive scanner here to find ALL files that will be deleted.
-        // For the sake of the prompt "Archivos mayores a X MB" and "logs innecesarios".
-        // Let's implement a recursive file collector.
-        const result = await getFilesRecursively(p);
+        // Report we are starting a root
+        if (onProgress) onProgress({ status: 'scanning', currentFile: p, percent: 0 });
+        
+        const result = await getFilesRecursively(p, (currentFile) => {
+            scannedCount++;
+            if (onProgress && scannedCount % 10 === 0) { // Throttle updates
+                onProgress({ 
+                    status: 'scanning', 
+                    currentFile: currentFile,
+                    percent: 0 // Unknown total yet
+                });
+            }
+        });
+        
         totalSize += result.size;
         filesToDelete = [...filesToDelete, ...result.files];
         readOnlyFiles = [...readOnlyFiles, ...result.readOnly];
     }
 
     const spaceRecoverableMB = parseFloat((totalSize / (1024 * 1024)).toFixed(2));
-    const estimatedTimeSeconds = Math.ceil(filesToDelete.length * 0.05); // Assume 50ms per file
-    const estimatedPerformanceGain = Math.min(100, Math.ceil(spaceRecoverableMB / 100)); // Fake metric based on size
+    const estimatedTimeSeconds = Math.ceil(filesToDelete.length * 0.05); 
+    const estimatedPerformanceGain = Math.min(100, Math.ceil(spaceRecoverableMB / 100)); 
 
     return {
         spaceRecoverableMB,
         estimatedPerformanceGain,
         estimatedTimeSeconds,
-        filesToDelete: filesToDelete.map(f => f.path), // Send only paths to UI if needed, or just count
+        filesToDelete: filesToDelete.map(f => f.path),
         readOnlyFiles: readOnlyFiles.map(f => f.path),
         fileCount: filesToDelete.length
     };
 }
 
-async function getFilesRecursively(dir) {
+async function getFilesRecursively(dir, onFileFound) {
     let files = [];
     let readOnly = [];
     let size = 0;
@@ -137,17 +148,18 @@ async function getFilesRecursively(dir) {
             const list = await fs.readdir(currentDir);
             for (const file of list) {
                 const filePath = path.join(currentDir, file);
+                
+                // Report progress
+                if (onFileFound) onFileFound(filePath);
+
                 try {
                     const stat = await fs.stat(filePath);
                     if (stat.isDirectory()) {
                         await walk(filePath);
-                        // We also delete the directory itself eventually
                         files.push({ path: filePath, size: 0, type: 'dir' });
                     } else {
                         files.push({ path: filePath, size: stat.size, type: 'file' });
                         size += stat.size;
-                        // Check if read-only (mode & 0o200) ? 0o200 is writable.
-                        // If (mode & 0o222) === 0, it is read-only.
                         if ((stat.mode & 0o222) === 0) {
                             readOnly.push({ path: filePath });
                         }

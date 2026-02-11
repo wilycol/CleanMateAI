@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onProgress: (callback) => ipcRenderer.on('cleanup-progress', (event, data) => callback(data)),
     removeProgressListeners: () => ipcRenderer.removeAllListeners('cleanup-progress'),
     askAI: (report) => ipcRenderer.invoke('ask-ai', report),
+    getReports: () => ipcRenderer.invoke('get-reports'),
     
     // Chat API
     chatSendMessage: (message, mode) => ipcRenderer.invoke('chat-send-message', { message, mode }),

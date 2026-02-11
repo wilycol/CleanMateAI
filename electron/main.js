@@ -2,8 +2,9 @@ const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
 const path = require('path');
 const log = require('electron-log');
 const { getSystemStats } = require('../services/monitor');
-const { cleanSystem } = require('../services/cleaner');
-const { analyzeSystem } = require('../services/apiClient');
+const { cleanSystem, analyzeSystem: scanJunk } = require('../services/cleaner');
+const { analyzeSystem: askAI } = require('../services/apiClient');
+const { saveReport, getReports } = require('../services/reportManager');
 const { processUserMessage, getChatHistory, clearChatHistory } = require('../services/aiService');
 const { updateLastAnalysis, updateLastCleanup } = require('../services/systemContextBuilder');
 const { interpretAction } = require('../services/actionInterpreter');
@@ -61,7 +62,14 @@ function createWindow() {
         mainWindow.loadURL('http://localhost:5173');
         mainWindow.webContents.openDevTools({ mode: 'detach' });
     } else {
-        mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+        // Updated path to match new 'build_output_clean' build output directory
+        const indexPath = path.join(__dirname, '../build_output_clean/index.html');
+        log.info(`Loading production file from: ${indexPath}`);
+        
+        mainWindow.loadFile(indexPath).catch(e => log.error('Failed to load index.html', e));
+        
+        // Open DevTools even in production to debug the black screen
+        mainWindow.webContents.openDevTools({ mode: 'detach' });
     }
 
     mainWindow.on('close', (event) => {
@@ -116,33 +124,96 @@ function createTray() {
 }
 
 app.whenReady().then(() => {
-    createWindow();
-    createTray();
-
-    // IPC Handlers
+    // Register IPC Handlers BEFORE creating window to avoid race conditions
     ipcMain.handle('get-system-stats', async () => {
-        // log.info('IPC: get-system-stats called'); // Commented to avoid spamming logs
+        // log.info('IPC: get-system-stats called');
         return await getSystemStats();
     });
 
     ipcMain.handle('run-cleanup', async (event) => {
         log.info('IPC: run-cleanup called');
-        // Define progress callback
         const onProgress = (data) => {
-            if (!mainWindow.isDestroyed()) {
+            if (mainWindow && !mainWindow.isDestroyed()) {
                 mainWindow.webContents.send('cleanup-progress', data);
             }
         };
         const result = await cleanSystem(onProgress);
-        updateLastCleanup(result); // Update context
+        
+        // Save report automatically
+        try {
+            await saveReport({
+                type: 'cleanup',
+                stats: result
+            });
+        } catch (e) {
+            log.error('Failed to auto-save report:', e);
+        }
+
+        updateLastCleanup(result);
         return result;
+    });
+
+    ipcMain.handle('get-reports', async () => {
+        return await getReports();
     });
 
     ipcMain.handle('analyze-system', async () => {
         log.info('IPC: analyze-system called');
-        const result = await analyzeSystem();
-        updateLastAnalysis(result); // Update context
-        return result;
+        
+        // 1. Gather basic system stats
+        const stats = await getSystemStats();
+        
+        // 2. Perform local scan for junk files with progress
+        // We define a callback to bridge between cleaner.js progress and UI
+        const onProgress = (data) => {
+             if (mainWindow && !mainWindow.isDestroyed()) {
+                 // The cleaner.js emits { status: 'scanning', currentFile: ..., percent: 0 }
+                 // The UI expects { percent: ..., currentFile: ... }
+                 // We send this to 'cleanup-progress' channel which the UI listens to during 'cleaning' phase
+                 // BUT for 'analyzing' phase, the UI (App.jsx) does NOT listen to 'cleanup-progress' by default in handleAnalyze()
+                 // We need to fix App.jsx to listen during analysis OR just log it for now.
+                 // Let's send it anyway, maybe we update App.jsx next.
+                 mainWindow.webContents.send('cleanup-progress', {
+                     percent: 0, 
+                     currentFile: `Analizando: ${data.currentFile}`
+                 });
+             }
+        };
+        
+        log.info('Starting local file scan...');
+        // We use the alias 'scanJunk' which maps to 'analyzeSystem' from cleaner.js
+        // cleaner.js analyzeSystem signature is (onProgress)
+        const junkResults = await scanJunk(onProgress);
+        log.info(`Scan complete. Found ${junkResults.fileCount} files.`);
+        
+        // 3. Ask AI for analysis
+        const cleanupStats = { 
+            freedMB: junkResults.spaceRecoverableMB, 
+            filesDeleted: junkResults.fileCount 
+        }; 
+        
+        // Notify UI that we are contacting AI
+        if (mainWindow && !mainWindow.isDestroyed()) {
+             mainWindow.webContents.send('cleanup-progress', {
+                 percent: 100,
+                 currentFile: "Consultando Inteligencia Artificial..."
+             });
+        }
+
+        const aiResult = await askAI(stats, cleanupStats);
+        
+        // Merge results: AI result + Local Scan stats
+        const finalResult = {
+            ...aiResult,
+            spaceRecoverableMB: junkResults.spaceRecoverableMB,
+            estimatedPerformanceGain: junkResults.estimatedPerformanceGain,
+            fileCount: junkResults.fileCount,
+            readOnlyFiles: junkResults.readOnlyFiles,
+            // Keep AI message
+        };
+
+        updateLastAnalysis(finalResult);
+        return finalResult;
     });
 
     // Chat IPC Handlers
@@ -170,16 +241,55 @@ app.whenReady().then(() => {
             throw new Error("Action blocked by security policy");
         }
         
-        // Execute logic based on action type
         if (action.type === 'analyze') {
-            // Trigger analysis via existing handler logic
-            const result = await analyzeSystem();
-            updateLastAnalysis(result);
-            return { success: true, result };
-        } else if (action.type === 'clean') {
-            // Trigger cleanup
+            // Fix: Use the correct alias 'scanJunk' and 'askAI' logic
+            // But wait, analyzeSystem handler does both. 
+            // We should reuse the existing handler logic or call the functions directly.
+            // Since we need to send progress, it's better to call the logic that sends progress.
+            // But we can't easily invoke another IPC handler from main.
+            // Let's copy the logic or refactor. Refactoring is safer.
+            
+            // We'll call the same logic as 'analyze-system' handler
+            log.info('Chat triggering analysis...');
+            
+            // 1. Stats
+            const stats = await getSystemStats();
+            
+            // 2. Scan
             const onProgress = (data) => {
-                if (!mainWindow.isDestroyed()) {
+                 if (mainWindow && !mainWindow.isDestroyed()) {
+                     mainWindow.webContents.send('cleanup-progress', {
+                         percent: 0, 
+                         currentFile: `Analizando: ${data.currentFile}`
+                     });
+                 }
+            };
+            const junkResults = await scanJunk(onProgress);
+            
+            // 3. AI
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                 mainWindow.webContents.send('cleanup-progress', {
+                     percent: 100,
+                     currentFile: "Consultando Inteligencia Artificial..."
+                 });
+            }
+            const cleanupStats = { freedMB: junkResults.spaceRecoverableMB, filesDeleted: junkResults.fileCount };
+            const aiResult = await askAI(stats, cleanupStats);
+            
+            const finalResult = {
+                ...aiResult,
+                spaceRecoverableMB: junkResults.spaceRecoverableMB,
+                estimatedPerformanceGain: junkResults.estimatedPerformanceGain,
+                fileCount: junkResults.fileCount,
+                readOnlyFiles: junkResults.readOnlyFiles,
+            };
+
+            updateLastAnalysis(finalResult);
+            return { success: true, result: finalResult };
+
+        } else if (action.type === 'clean') {
+            const onProgress = (data) => {
+                if (mainWindow && !mainWindow.isDestroyed()) {
                     mainWindow.webContents.send('cleanup-progress', data);
                 }
             };
@@ -193,16 +303,20 @@ app.whenReady().then(() => {
 
     ipcMain.handle('ask-ai', async (event, report) => {
         log.info('IPC: ask-ai called');
-        return await analyzeSystem(report.systemStats, report.cleanupStats);
+        // Fix: Use 'askAI' instead of 'analyzeSystem'
+        return await askAI(report.systemStats, report.cleanupStats);
     });
 
     ipcMain.on('window-minimize', () => {
-        mainWindow.minimize();
+        if (mainWindow) mainWindow.minimize();
     });
 
     ipcMain.on('window-close', () => {
-        mainWindow.hide();
+        if (mainWindow) mainWindow.hide();
     });
+
+    createWindow();
+    createTray();
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();

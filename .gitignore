@@ -4,13 +4,21 @@ __pycache__/
 *.py[cod]
 .env
 
-# Distribución
+# Distribución y Builds
 build/
 dist/
 release/
+build_output/
+build_output_clean/
 *.spec
 *.exe
+
+# Dependencias Node
+node_modules/
 
 # Logs y Temporales
 *.log
 cleanup_log.txt
+reports.json
+chat-history.json
+ai-metrics.json

@@ -7,6 +7,8 @@ function App() {
   const [analysis, setAnalysis] = useState(null);
   const [progress, setProgress] = useState({ percent: 0, currentFile: '' });
   const [report, setReport] = useState(null);
+  const [reportsHistory, setReportsHistory] = useState([]);
+  const [showReports, setShowReports] = useState(false);
   const [aiResponse, setAiResponse] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
 
@@ -21,11 +23,36 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
+  const toggleReports = async () => {
+    if (!showReports) {
+        try {
+            const history = await window.electronAPI.getReports();
+            setReportsHistory(history);
+        } catch (e) {
+            console.error("Error fetching reports", e);
+        }
+    }
+    setShowReports(!showReports);
+  };
+
   const handleAnalyze = async () => {
     setPhase('analyzing');
-    const result = await window.electronAPI.analyzeSystem();
-    setAnalysis(result);
-    setPhase('confirmation');
+    
+    // Listen for progress during analysis too
+    window.electronAPI.onProgress((data) => {
+        setProgress(data);
+    });
+
+    try {
+        const result = await window.electronAPI.analyzeSystem();
+        setAnalysis(result);
+        setPhase('confirmation');
+    } catch (e) {
+        console.error("Analysis failed", e);
+        setPhase('idle');
+    } finally {
+        window.electronAPI.removeProgressListeners();
+    }
   };
 
   const handleStartOptimization = async () => {
@@ -65,7 +92,7 @@ function App() {
     }
   };
 
-  const handleChatAction = (action) => {
+  const handleChatActionStart = (action) => {
       if (action.type === 'analyze') {
           setPhase('analyzing');
       } else if (action.type === 'clean') {
@@ -74,6 +101,22 @@ function App() {
           window.electronAPI.onProgress((data) => {
             setProgress(data);
           });
+      }
+  };
+
+  const handleChatActionComplete = (action, result) => {
+      if (action.type === 'analyze') {
+          setAnalysis(result);
+          setPhase('confirmation');
+      } else if (action.type === 'clean') {
+          // Remove listeners
+          window.electronAPI.removeProgressListeners();
+          
+          setReport({
+              ...result,
+              duration: 'N/A' // Duration calculation might need adjustment here
+          });
+          setPhase('complete');
       }
   };
 
@@ -96,7 +139,10 @@ function App() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#1a1a1a', color: 'white', fontFamily: 'Segoe UI, sans-serif' }}>
       {/* Title Bar */}
       <div className="title-bar" style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px', WebkitAppRegion: 'drag' }}>
-        <button onClick={() => setIsChatOpen(!isChatOpen)} style={{ background: 'none', border: 'none', color: isChatOpen ? '#00C851' : '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', fontSize: '16px', marginRight: '10px' }}>
+        <button onClick={toggleReports} style={{ background: 'none', border: 'none', color: showReports ? '#00C851' : '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', fontSize: '16px', marginRight: '10px' }} title="Historial de Reportes">
+            🕒
+        </button>
+        <button onClick={() => setIsChatOpen(!isChatOpen)} style={{ background: 'none', border: 'none', color: isChatOpen ? '#00C851' : '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', fontSize: '16px', marginRight: '10px' }} title="Chat AI">
             🤖
         </button>
         <button onClick={() => window.electronAPI.minimize()} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', fontSize: '16px' }}>_</button>
@@ -105,10 +151,51 @@ function App() {
 
       <AIChat 
         isOpen={isChatOpen} 
-        onClose={() => setIsChatOpen(false)} 
+        onClose={() => setIsChatOpen(false)}
         onActionTrigger={handleChatActionStart}
         onActionComplete={handleChatActionComplete}
       />
+
+      {/* Reports History Modal */}
+      {showReports && (
+        <div style={{
+            position: 'absolute',
+            top: '40px',
+            right: '20px',
+            width: '300px',
+            maxHeight: '400px',
+            background: '#2a2a2a',
+            borderRadius: '10px',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+            zIndex: 1000,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+        }}>
+            <div style={{ padding: '15px', borderBottom: '1px solid #444', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ margin: 0, fontSize: '16px' }}>Historial de Reportes</h3>
+                <button onClick={() => setShowReports(false)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>✕</button>
+            </div>
+            <div style={{ overflowY: 'auto', padding: '10px' }}>
+                {reportsHistory.length === 0 ? (
+                    <p style={{ color: '#888', textAlign: 'center', fontSize: '13px' }}>No hay reportes guardados.</p>
+                ) : (
+                    reportsHistory.map(r => (
+                        <div key={r.id} style={{ background: '#333', padding: '10px', borderRadius: '5px', marginBottom: '10px', fontSize: '13px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                                <span style={{ color: '#00C851', fontWeight: 'bold' }}>Limpieza</span>
+                                <span style={{ color: '#888' }}>{new Date(r.timestamp).toLocaleDateString()}</span>
+                            </div>
+                            <div style={{ color: '#ccc' }}>
+                                <div>Liberado: {r.stats?.freedMB || 0} MB</div>
+                                <div>Archivos: {r.stats?.filesDeleted || 0}</div>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto' }}>
@@ -129,6 +216,37 @@ function App() {
             <h2 style={{ fontSize: '18px', margin: 0 }}>{stats.status.toUpperCase()}</h2>
         </div>
 
+        {/* Floating Chat Button */}
+        {!isChatOpen && (
+            <button 
+                onClick={() => setIsChatOpen(true)}
+                style={{
+                    position: 'absolute',
+                    bottom: '20px',
+                    right: '20px',
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(45deg, #00C851, #007bff)',
+                    border: 'none',
+                    color: 'white',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+                    zIndex: 900,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'transform 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                title="Hablar con CleanMate AI"
+            >
+                🤖
+            </button>
+        )}
+
         {/* Stats Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', width: '100%', maxWidth: '400px', marginBottom: '30px' }}>
             <StatCard label="CPU" value={`${stats.cpu}%`} />
@@ -148,9 +266,14 @@ function App() {
 
         {/* Phase: ANALYZING */}
         {phase === 'analyzing' && (
-            <div style={{ textAlign: 'center' }}>
-                <p>Escaneando sistema...</p>
-                <div className="spinner"></div>
+            <div style={{ textAlign: 'center', width: '100%', maxWidth: '400px' }}>
+                <p style={{ marginBottom: '15px' }}>Escaneando sistema...</p>
+                <div className="spinner" style={{ margin: '0 auto 20px auto' }}></div>
+                
+                {/* Progress Detail */}
+                <div style={{ fontSize: '12px', color: '#888', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', background: '#222', padding: '8px', borderRadius: '4px' }}>
+                    {progress.currentFile || 'Inicializando...'}
+                </div>
             </div>
         )}
 

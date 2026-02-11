@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'release',
+    outDir: 'build_output_clean',
     emptyOutDir: true,
   }
 })

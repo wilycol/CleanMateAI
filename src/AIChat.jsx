@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const AIChat = ({ isOpen, onClose, onActionTrigger }) => {
+const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [status, setStatus] = useState('idle'); // idle, thinking, recording

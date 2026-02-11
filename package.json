@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "electron:dev": "concurrently \"npm run dev\" \"wait-on tcp:5173 && electron .\"",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on tcp:5173 && electron . --dev\"",
+    "electron:preview": "electron .",
     "electron:build": "vite build && electron-builder"
   },
   "keywords": [
@@ -52,10 +53,10 @@
       "createStartMenuShortcut": true
     },
     "directories": {
-      "output": "release"
+      "output": "build_output_clean"
     },
     "files": [
-      "release/**/*",
+      "build_output_clean/**/*",
       "electron/**/*",
       "services/**/*",
       "web/assets/**/*",
