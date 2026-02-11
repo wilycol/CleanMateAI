@@ -52,10 +52,10 @@
       "createStartMenuShortcut": true
     },
     "directories": {
-      "output": "dist"
+      "output": "release"
     },
     "files": [
-      "dist/**/*",
+      "release/**/*",
       "electron/**/*",
       "services/**/*",
       "web/assets/**/*",

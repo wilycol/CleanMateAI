@@ -7,6 +7,7 @@ __pycache__/
 # Distribución
 build/
 dist/
+release/
 *.spec
 *.exe
 
