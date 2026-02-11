@@ -42,7 +42,8 @@
     "productName": "CleanMate AI",
     "win": {
       "target": "nsis",
-      "icon": "web/assets/logo.ico"
+      "icon": "web/assets/logo.ico",
+      "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
       "oneClick": false,

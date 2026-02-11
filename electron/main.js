@@ -4,6 +4,9 @@ const log = require('electron-log');
 const { getSystemStats } = require('../services/monitor');
 const { cleanSystem } = require('../services/cleaner');
 const { analyzeSystem } = require('../services/apiClient');
+const { processUserMessage, getChatHistory, clearChatHistory } = require('../services/aiService');
+const { updateLastAnalysis, updateLastCleanup } = require('../services/systemContextBuilder');
+const { interpretAction } = require('../services/actionInterpreter');
 
 // Configure Logging
 log.initialize();
@@ -122,9 +125,70 @@ app.whenReady().then(() => {
         return await getSystemStats();
     });
 
-    ipcMain.handle('run-cleanup', async () => {
+    ipcMain.handle('run-cleanup', async (event) => {
         log.info('IPC: run-cleanup called');
-        return await cleanSystem();
+        // Define progress callback
+        const onProgress = (data) => {
+            if (!mainWindow.isDestroyed()) {
+                mainWindow.webContents.send('cleanup-progress', data);
+            }
+        };
+        const result = await cleanSystem(onProgress);
+        updateLastCleanup(result); // Update context
+        return result;
+    });
+
+    ipcMain.handle('analyze-system', async () => {
+        log.info('IPC: analyze-system called');
+        const result = await analyzeSystem();
+        updateLastAnalysis(result); // Update context
+        return result;
+    });
+
+    // Chat IPC Handlers
+    ipcMain.handle('chat-get-greeting', async (event, mode) => {
+        const { generateGreeting } = require('../services/aiService');
+        return await generateGreeting(mode);
+    });
+
+    ipcMain.handle('chat-send-message', async (event, { message, mode }) => {
+        return await processUserMessage(message, mode);
+    });
+
+    ipcMain.handle('chat-get-history', async () => {
+        return await getChatHistory();
+    });
+
+    ipcMain.handle('chat-clear-history', async () => {
+        return await clearChatHistory();
+    });
+
+    ipcMain.handle('chat-execute-action', async (event, action) => {
+        log.info('IPC: chat-execute-action', action);
+        const validAction = interpretAction(action);
+        if (!validAction) {
+            throw new Error("Action blocked by security policy");
+        }
+        
+        // Execute logic based on action type
+        if (action.type === 'analyze') {
+            // Trigger analysis via existing handler logic
+            const result = await analyzeSystem();
+            updateLastAnalysis(result);
+            return { success: true, result };
+        } else if (action.type === 'clean') {
+            // Trigger cleanup
+            const onProgress = (data) => {
+                if (!mainWindow.isDestroyed()) {
+                    mainWindow.webContents.send('cleanup-progress', data);
+                }
+            };
+            const result = await cleanSystem(onProgress);
+            updateLastCleanup(result);
+            return { success: true, result };
+        }
+        
+        return { success: false, message: "Action type not implemented yet" };
     });
 
     ipcMain.handle('ask-ai', async (event, report) => {
