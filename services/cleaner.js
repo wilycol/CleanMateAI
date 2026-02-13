@@ -205,18 +205,29 @@ async function cleanSystem(onProgress) {
 
         for (const itemPath of sortedItems) {
             try {
-                const stat = await fs.stat(itemPath);
+                // Check existence first to avoid ENOENT on stat if race condition
+                let stat;
+                try {
+                    stat = await fs.stat(itemPath);
+                } catch (statErr) {
+                    if (statErr.code === 'ENOENT') continue; // File already gone
+                    throw statErr;
+                }
+
                 if (stat.isDirectory()) {
-                    await fs.rmdir(itemPath); // Use rmdir for empty dirs (since we deleted files inside)
+                    // Use fs.rm with force: true for directories
+                    await fs.rm(itemPath, { recursive: true, force: true });
                 } else {
                     await fs.unlink(itemPath);
+                    // Only count size if successfully deleted
                     freedBytes += stat.size;
                 }
                 filesDeleted++;
             } catch (e) {
-                // Try force delete if read-only? fs.unlink usually handles it.
-                // If permission denied, log it.
-                errors.push({ path: itemPath, error: e.message });
+                // Ignore ENOENT (file gone), log others
+                if (e.code !== 'ENOENT') {
+                     errors.push({ path: itemPath, error: e.message });
+                }
             }
 
             processed++;

@@ -1,6 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import AIChat from './AIChat';
 
+const ReportItem = ({ report }) => {
+    const [expanded, setExpanded] = useState(false);
+    const errors = report.stats?.errors || [];
+    const hasErrors = errors.length > 0;
+
+    return (
+        <div style={{ background: '#333', padding: '10px', borderRadius: '5px', marginBottom: '10px', fontSize: '13px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                <span style={{ color: '#00C851', fontWeight: 'bold' }}>Limpieza</span>
+                <span style={{ color: '#888' }}>{new Date(report.timestamp).toLocaleString()}</span>
+            </div>
+            <div style={{ color: '#ccc' }}>
+                <div>Liberado: {report.stats?.freedMB || 0} MB</div>
+                <div>Archivos: {report.stats?.filesDeleted || 0}</div>
+                {hasErrors && (
+                    <div style={{ marginTop: '5px' }}>
+                        <button 
+                            onClick={() => setExpanded(!expanded)}
+                            style={{ 
+                                background: 'none', 
+                                border: 'none', 
+                                color: '#ffbb33', 
+                                cursor: 'pointer', 
+                                padding: 0,
+                                textDecoration: 'underline',
+                                fontSize: '12px'
+                            }}
+                        >
+                            {expanded ? 'Ocultar advertencias' : `Ver ${errors.length} advertencias`}
+                        </button>
+                    </div>
+                )}
+            </div>
+            {expanded && hasErrors && (
+                <div style={{ marginTop: '10px', maxHeight: '150px', overflowY: 'auto', background: '#222', padding: '5px', borderRadius: '3px' }}>
+                    {errors.map((e, i) => (
+                        <div key={i} style={{ color: '#ff4444', fontSize: '11px', marginBottom: '3px', borderBottom: '1px solid #444', paddingBottom: '2px' }}>
+                            <div style={{ fontWeight: 'bold' }}>{e.error}</div>
+                            <div style={{ color: '#888', wordBreak: 'break-all' }}>{e.path}</div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
 function App() {
   const [stats, setStats] = useState({ cpu: 0, ram: 0, disk: 0, status: 'good' });
   const [phase, setPhase] = useState('idle'); // idle, analyzing, confirmation, cleaning, complete
@@ -181,16 +228,7 @@ function App() {
                     <p style={{ color: '#888', textAlign: 'center', fontSize: '13px' }}>No hay reportes guardados.</p>
                 ) : (
                     reportsHistory.map(r => (
-                        <div key={r.id} style={{ background: '#333', padding: '10px', borderRadius: '5px', marginBottom: '10px', fontSize: '13px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                                <span style={{ color: '#00C851', fontWeight: 'bold' }}>Limpieza</span>
-                                <span style={{ color: '#888' }}>{new Date(r.timestamp).toLocaleDateString()}</span>
-                            </div>
-                            <div style={{ color: '#ccc' }}>
-                                <div>Liberado: {r.stats?.freedMB || 0} MB</div>
-                                <div>Archivos: {r.stats?.filesDeleted || 0}</div>
-                            </div>
-                        </div>
+                        <ReportItem key={r.id} report={r} />
                     ))
                 )}
             </div>

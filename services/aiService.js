@@ -108,51 +108,64 @@ async function processUserMessage(message, mode = 'analysis') {
     return assistantEntry;
 }
 
-// Mock AI Logic - Replace with real API call later
+// Mock AI Logic - Enhanced with "Natural Persona" and Context Awareness
 async function generateAIResponse(userMsg, context) {
     const msg = userMsg.toLowerCase();
+    
+    // --- 1. Intent Detection Helper ---
+    const isGreeting = /\b(hola|buenos|buenas|hey|que tal)\b/.test(msg);
+    const isAnalyze = /\b(analizar|escanear|buscar|verificar|estado|diagnostico)\b/.test(msg);
+    const isClean = /\b(limpiar|borrar|eliminar|optimizar|liberar|basura)\b/.test(msg);
+    const isSlow = /\b(lento|trabado|pegado|lag|tarda|rapidez|velocidad)\b/.test(msg);
+    const isHistory = /\b(historial|reporte|anterior|pasado|ultimo)\b/.test(msg);
+    const isThanks = /\b(gracias|agradecido|genial|ok|listo|bueno)\b/.test(msg);
+    const isHelp = /\b(ayuda|socorro|que haces|para que sirves)\b/.test(msg);
+
+    // --- 2. Persona & Context Variables ---
+    const { cpuLoad, ramUsed, diskUsed } = context.systemMetrics;
+    const cpuHigh = cpuLoad > 80;
+    const ramHigh = ramUsed > 80;
+    const diskFull = diskUsed > 90;
+    
+    // Natural conversation starters
+    const openers = [
+        "¡Hola! Soy tu asistente CleanMate.",
+        "Aquí estoy para ayudarte con tu PC.",
+        "¡Qué bueno verte por aquí!"
+    ];
+
     let response = "";
     let actionSuggestion = null;
 
-    // Default response if no intent is matched
-    response = "Entendido. ¿En qué más puedo ayudarte?";
+    // --- 3. Logic Engine ---
 
-    // 1. Analyze Intent
-    if (msg.includes('hola') || msg.includes('buenos') || msg.includes('inicio')) {
-        response = `¡Hola! He analizado tu sistema en modo **${context.mode}**.
+    if (isGreeting) {
+        const status = (cpuHigh || ramHigh || diskFull) 
+            ? "Veo que tu sistema está trabajando duro hoy." 
+            : "Tu sistema se ve bastante tranquilo por ahora.";
         
-📊 **Estado Actual:**
-- CPU: ${context.systemMetrics.cpuLoad}%
-- RAM: ${context.systemMetrics.ramUsed}%
-- Disco: ${context.systemMetrics.diskUsed}%
-
-¿Quieres que busquemos archivos basura o tienes alguna consulta específica?`;
+        response = `${openers[Math.floor(Math.random() * openers.length)]} ${status}
         
-        if (context.systemMetrics.diskUsed > 90) {
-            response += "\n\n⚠️ **Alerta:** Tu disco está muy lleno. Recomiendo un análisis urgente.";
-            actionSuggestion = { type: 'analyze', label: 'Iniciar Análisis Urgente', description: 'Disco Crítico (>90%)' };
-        } else if (context.mode === 'optimization') {
-             response += "\n\nEn modo optimización puedo sugerirte cerrar procesos o limpiar cachés profundos.";
-        }
+📊 **Vistazo Rápido:**
+• CPU: ${cpuLoad}% ${cpuHigh ? '🔥' : '✅'}
+• RAM: ${ramUsed}% ${ramHigh ? '⚠️' : '✅'}
+• Disco: ${diskUsed}% ${diskFull ? '⛔' : '✅'}
 
-    } else if (msg.includes('analizar') || msg.includes('escanear') || msg.includes('buscar') || msg.includes('basura')) {
-        response = "Puedo iniciar un análisis completo de archivos temporales, caché de navegadores (Chrome/Edge) y logs del sistema.\n\nEste proceso es seguro y no borra tus documentos personales. ¿Te gustaría proceder?";
+¿Te gustaría que hagamos un chequeo más profundo?`;
+
+        actionSuggestion = { type: 'analyze', label: 'Hacer Chequeo', description: 'Revisión rápida' };
+
+    } else if (isAnalyze) {
+        response = "¡Entendido! Me pondré mi gorra de detective 🕵️‍♂️. \n\nVoy a buscar archivos temporales, cachés olvidados y cosas que están ocupando espacio sin pagar renta. ¿Me das luz verde para escanear?";
         actionSuggestion = {
             type: 'analyze',
-            label: 'Iniciar Análisis',
-            description: 'Escanear sistema en busca de archivos basura'
+            label: 'Iniciar Escaneo',
+            description: 'Buscar archivos basura'
         };
 
-    } else if (msg.includes('limpiar') || msg.includes('borrar') || msg.includes('optimizar') || msg.includes('eliminar')) {
+    } else if (isClean) {
         if (context.lastAnalysis && context.lastAnalysis.recoverableMB > 0) {
-            response = `Según el último análisis, podemos recuperar **${context.lastAnalysis.recoverableMB} MB**.
-            
-Esto incluye:
-- Archivos Temporales
-- Caché de Chrome/Edge
-- Logs de Windows
-
-¿Ejecuto la limpieza ahora?`;
+            response = `¡Manos a la obra! 🧹\n\nSegún lo que vi, podemos recuperar unos **${context.lastAnalysis.recoverableMB} MB**. Eso le dará un respiro a tu disco. ¿Procedemos con la limpieza?`;
             actionSuggestion = {
                 type: 'clean',
                 targets: ['temp', 'cache_chrome', 'cache_edge'],
@@ -160,64 +173,55 @@ Esto incluye:
                 description: `Liberar ~${context.lastAnalysis.recoverableMB} MB`
             };
         } else {
-            response = "Para limpiar de forma segura, primero necesito realizar un análisis reciente y identificar qué archivos se pueden borrar sin riesgo. ¿Quieres que lo haga?";
-            actionSuggestion = { type: 'analyze', label: 'Analizar Primero', description: 'Detectar archivos basura' };
+            response = "¡Claro! Pero para no borrar nada importante a ciegas, primero necesito echar un vistazo rápido. ¿Hacemos un escaneo primero?";
+            actionSuggestion = { type: 'analyze', label: 'Escanear Primero', description: 'Por seguridad' };
         }
 
-    } else if (msg.includes('plan') || msg.includes('recomendacion') || msg.includes('recomendar') || msg.includes('sugerencia')) {
-        if (context.mode === 'optimization') {
-             response = `📋 **Plan de Optimización Sugerido:**
-
-1. **Limpieza de Disco:** Detectar y borrar archivos temporales (se puede hacer ahora).
-2. **Gestión de Inicio:** Revisa qué apps inician con Windows (puedes hacerlo desde el Administrador de Tareas).
-3. **Liberar RAM:** Cierra pestañas de navegador inactivas.
-
-¿Quieres empezar por el paso 1 (Limpieza)?`;
-             actionSuggestion = { type: 'analyze', label: 'Comenzar Limpieza', description: 'Paso 1 del Plan' };
+    } else if (isSlow || isHelp) {
+        if (ramHigh) {
+            response = "Uff, sí... noto que tu memoria RAM está sudando (está al " + ramUsed + "%). 😰\n\n**Mi consejo:**\n1. Cierra las pestañas del navegador que no uses.\n2. Déjame limpiar los archivos temporales para aligerar la carga.\n\n¿Te ayudo con la limpieza?";
+            actionSuggestion = { type: 'analyze', label: 'Analizar para Optimizar', description: 'Aligerar sistema' };
+        } else if (diskFull) {
+            response = "El problema podría ser tu disco duro. Está casi lleno (" + diskUsed + "%). Cuando el disco se llena, todo se mueve en cámara lenta. 🐢\n\n¡Necesitamos liberar espacio urgente!";
+            actionSuggestion = { type: 'analyze', label: 'Liberar Espacio', description: 'Urgente: Disco Lleno' };
         } else {
-             response = "Para darte un plan personalizado, necesito saber tu objetivo. ¿Buscas liberar espacio en disco o mejorar la velocidad (FPS/RAM)?";
+            response = "Tu hardware parece estar bien en los números (CPU y RAM normales), pero a veces la 'basura digital' oculta ralentiza todo. \n\nPropongo hacer una limpieza de mantenimiento. ¿Qué dices?";
+            actionSuggestion = { type: 'analyze', label: 'Mantenimiento Preventivo', description: 'Optimizar flujo' };
         }
-    } else if (msg.includes('historial') || msg.includes('ultimo reporte') || msg.includes('cuando limpie') || msg.includes('anterior')) {
+
+    } else if (isHistory) {
         if (context.reports && context.reports.length > 0) {
             const last = context.reports[0];
-            response = `📋 **Último Reporte (${new Date(last.timestamp).toLocaleDateString()}):**
-            
-✅ Se liberaron **${last.stats.freedMB} MB**
-📂 Archivos eliminados: **${last.stats.filesDeleted}**
-
-¿Quieres ver más detalles en la sección de historial?`;
+            response = `Haciendo memoria... 🤔\n\nLa última vez (el ${new Date(last.timestamp).toLocaleDateString()}) eliminamos **${last.stats.filesDeleted} archivos** y recuperamos **${last.stats.freedMB} MB**. ¡Fue un buen trabajo!`;
         } else {
-            response = "No tengo registros de limpiezas anteriores. ¿Te gustaría realizar el primer análisis ahora?";
-            actionSuggestion = { type: 'analyze', label: 'Iniciar Análisis', description: 'Primer escaneo' };
+            response = "Aún no tenemos historias de batallas pasadas. ¡Esta podría ser nuestra primera victoria contra los archivos basura! ¿Empezamos?";
+            actionSuggestion = { type: 'analyze', label: 'Iniciar Misión', description: 'Primer análisis' };
         }
 
-    } else if (msg.includes('lento') || msg.includes('rendimiento') || msg.includes('trabado')) {
-        if (context.systemMetrics.ramUsed > 80) {
-            response = `Noto que tu RAM está al **${context.systemMetrics.ramUsed}%**, lo cual es alto.
-            
-🔹 **Sugerencia:** Cierra aplicaciones pesadas como navegadores con muchas pestañas o editores de video.
-🔹 **Acción:** Puedo limpiar la caché para intentar liberar algo de carga.`;
-        } else {
-            response = "Tu consumo de recursos parece normal (CPU y RAM estables). Si sientes lentitud, podría ser por fragmentación del disco o drivers desactualizados. Una limpieza de temporales suele ayudar.";
-            actionSuggestion = { type: 'analyze', label: 'Limpiar Temporales', description: 'Mejorar respuesta del sistema' };
-        }
+    } else if (isThanks) {
+        response = "¡De nada! Es un placer mantener tu PC en forma. Si notas cualquier otra cosa rara, aquí estaré. 👋";
+
     } else {
-        // Fallback with context awareness
-        if (context.mode === 'hardware') {
-            response = `Entendido. En modo Hardware puedo darte detalles sobre tu CPU, RAM y Disco.
-            
-- CPU: ${context.systemMetrics.cpuLoad}%
-- RAM: ${context.systemMetrics.ramUsed}%
-- Disco Libre: ${context.systemMetrics.diskFreeGB} GB
-
-¿Necesitas más detalles técnicos?`;
-        } else {
-            response = "Entendido. ¿Te gustaría realizar un análisis del sistema, optimizar el rendimiento o consultar el estado de tu hardware?";
-             actionSuggestion = { type: 'analyze', label: 'Ver Estado del Sistema', description: 'Análisis rápido' };
+        // --- 4. Off-Topic / Fallback Handler (The "Affectionate Guide") ---
+        const offTopicResponses = [
+            "Me encanta tu curiosidad, pero mi cerebro digital está diseñado específicamente para cuidar de tu PC. 🖥️ ¿Volvemos a revisar por qué tu sistema podría ir más rápido?",
+            "¡Qué tema tan interesante! Aunque confieso que me pierdo un poco si no hablamos de Gigabytes y procesadores. 😅 ¿Te parece si nos enfocamos en optimizar tu equipo?",
+            "Aprecio la charla, de verdad. Pero soy un especialista en rendimiento y limpieza, y no quisiera darte consejos equivocados sobre otros temas. ¿Cómo sientes la velocidad de tu PC hoy?",
+            "Ay, me encantaría saber de eso, pero mis circuitos solo entienden de optimización y limpieza. 🧹 Regresemos a lo nuestro: ¿Te gustaría hacer un análisis rápido?"
+        ];
+        
+        response = offTopicResponses[Math.floor(Math.random() * offTopicResponses.length)];
+        
+        // Always offer a way back to the main path
+        if (!actionSuggestion) {
+             actionSuggestion = { type: 'analyze', label: 'Ver Estado del PC', description: 'Volver al tema' };
         }
     }
 
-    return { response, actionSuggestion };
+    return {
+        response,
+        actionSuggestion
+    };
 }
 
 module.exports = { 
