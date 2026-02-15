@@ -73,6 +73,23 @@ def analyze_system():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/report', methods=['POST'])
+def receive_report():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+            
+        # Log del reporte recibido (Simulación de guardado en DB)
+        print(f"Reporte recibido: {data.get('type', 'unknown')} - {len(str(data))} bytes")
+        
+        # Aquí se podría guardar en base de datos
+        # db.save_report(data)
+        
+        return jsonify({"status": "success", "message": "Report received successfully"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/', methods=['GET'])
 def health_check():
     return jsonify({"status": "CleanMate AI Backend is running", "version": "1.0.0"})

@@ -18,16 +18,16 @@ function isAdmin() {
 function getPathsToClean() {
     const isElevated = isAdmin();
     const paths = [
-        path.join(os.tmpdir()), // %TEMP%
-        path.join(os.homedir(), 'AppData', 'Local', 'Temp'),
+        { path: path.join(os.tmpdir()), category: 'Temporales' }, // %TEMP%
+        { path: path.join(os.homedir(), 'AppData', 'Local', 'Temp'), category: 'Temporales' },
         // Chrome Cache
-        path.join(os.homedir(), 'AppData', 'Local', 'Google', 'Chrome', 'User Data', 'Default', 'Cache'),
+        { path: path.join(os.homedir(), 'AppData', 'Local', 'Google', 'Chrome', 'User Data', 'Default', 'Cache'), category: 'Caché Navegador' },
         // Edge Cache
-        path.join(os.homedir(), 'AppData', 'Local', 'Microsoft', 'Edge', 'User Data', 'Default', 'Cache')
+        { path: path.join(os.homedir(), 'AppData', 'Local', 'Microsoft', 'Edge', 'User Data', 'Default', 'Cache'), category: 'Caché Navegador' }
     ];
 
     if (isElevated) {
-        paths.push(path.join(process.env.SystemRoot || 'C:\\Windows', 'Logs'));
+        paths.push({ path: path.join(process.env.SystemRoot || 'C:\\Windows', 'Logs'), category: 'Registros Sistema' });
     }
 
     return paths;
@@ -40,7 +40,7 @@ const ALLOWED_ROOTS = [
     process.env.SystemRoot || 'C:\\Windows'
 ].map(r => path.resolve(r).toLowerCase());
 
-async function scanDirectory(dirPath) {
+async function scanDirectory(dirPath, category) {
     let files = [];
     let size = 0;
     
@@ -61,21 +61,22 @@ async function scanDirectory(dirPath) {
                 try {
                     const stat = await fs.stat(curPath);
                     if (stat.isFile()) {
-                        files.push({ path: curPath, size: stat.size });
+                        files.push({ 
+                            path: curPath, 
+                            size: stat.size,
+                            category: category,
+                            name: file
+                        });
                         size += stat.size;
                     } else if (stat.isDirectory()) {
-                        // Recursively scan subdirectories? 
-                        // For analysis, maybe just count them or scan 1 level deep to avoid long wait?
-                        // Let's do a simple recursive scan but limit depth or assume fs-extra remove handles it.
-                        // For accurate size we need recursion.
-                        // For the prompt "Archivos mayores a X MB", let's stick to files.
-                        // We will skip recursive scan for now to be fast, or implement a fast walker.
-                        // fs-extra doesn't have a walker. 
-                        // Let's just return top level files for now to keep it responsive, 
-                        // OR if we want "Real" metrics, we need to walk.
-                        // Let's assume we clean top level files and folders in temp.
-                        // Actually, temp folders usually contain many nested files.
-                        // Let's use a simple recursive walker with limit.
+                        // Shallow scan for subdirectories to find large files logic could go here
+                        // For now, keeping it shallow-ish for performance or adding recursion logic if needed
+                        // Implementation of recursive scan for deep stats:
+                        try {
+                             const subFiles = await scanRecursive(curPath, category);
+                             files = files.concat(subFiles.files);
+                             size += subFiles.size;
+                        } catch (e) {}
                     }
                 } catch (e) {
                     // Ignore
@@ -88,16 +89,100 @@ async function scanDirectory(dirPath) {
     return { files, size };
 }
 
+// Helper for recursive scan (limited depth/safety)
+async function scanRecursive(dirPath, category, depth = 0) {
+    if (depth > 3) return { files: [], size: 0 }; // Limit recursion depth
+    let files = [];
+    let size = 0;
+
+    try {
+        const dirFiles = await fs.readdir(dirPath);
+        for (const file of dirFiles) {
+            const curPath = path.join(dirPath, file);
+            try {
+                const stat = await fs.stat(curPath);
+                if (stat.isFile()) {
+                    files.push({ 
+                        path: curPath, 
+                        size: stat.size,
+                        category: category,
+                        name: file
+                    });
+                    size += stat.size;
+                } else if (stat.isDirectory()) {
+                    const subResult = await scanRecursive(curPath, category, depth + 1);
+                    files = files.concat(subResult.files);
+                    size += subResult.size;
+                }
+            } catch (e) {}
+        }
+    } catch (e) {}
+    return { files, size };
+}
+
 async function analyzeSystem(onProgress) {
     log.info('Starting system analysis...');
     const paths = getPathsToClean();
+    let allFiles = [];
     let totalSize = 0;
-    let filesToDelete = [];
-    let readOnlyFiles = [];
-    let scannedCount = 0;
+    
+    // Categories tracking
+    const categories = {
+        'Temporales': { size: 0, count: 0 },
+        'Caché Navegador': { size: 0, count: 0 },
+        'Registros Sistema': { size: 0, count: 0 }
+    };
+
+    let processedCount = 0;
+    const totalPaths = paths.length;
 
     for (const p of paths) {
-        // Report we are starting a root
+        // Report progress
+        if (onProgress) {
+            const percent = Math.round((processedCount / totalPaths) * 100);
+            onProgress({ percent, status: `Analizando ${p.category}...` });
+        }
+
+        const { files, size } = await scanDirectory(p.path, p.category);
+        
+        // Update aggregates
+        allFiles = allFiles.concat(files);
+        totalSize += size;
+        
+        if (categories[p.category]) {
+            categories[p.category].size += size;
+            categories[p.category].count += files.length;
+        } else {
+             // Fallback
+             categories[p.category] = { size, count: files.length };
+        }
+
+        processedCount++;
+    }
+
+    // Identify Top 10 heaviest files
+    const topFiles = allFiles
+        .sort((a, b) => b.size - a.size)
+        .slice(0, 10)
+        .map(f => ({
+            name: f.name,
+            path: f.path, // Full path for tooltip/details
+            size: f.size,
+            category: f.category
+        }));
+
+    // Identify recoverable space (all found files are potentially recoverable in this context)
+    const recoverableMB = (totalSize / (1024 * 1024)).toFixed(2);
+
+    return {
+        totalSize,
+        recoverableMB,
+        fileCount: allFiles.length,
+        categories,
+        topFiles,
+        files: allFiles // Return all for cleaning phase reference
+    };
+}
         if (onProgress) onProgress({ status: 'scanning', currentFile: p, percent: 0 });
         
         const result = await getFilesRecursively(p, (currentFile) => {

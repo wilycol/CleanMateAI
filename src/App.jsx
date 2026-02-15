@@ -6,7 +6,46 @@ const ReportItem = ({ report }) => {
     const errors = report.stats?.errors || [];
     const hasErrors = errors.length > 0;
 
-    return (
+    const renderConfirmation = () => (
+    <div className="confirmation-view" style={cardStyle}>
+       <h2 style={{marginBottom: '20px'}}>Análisis Completado</h2>
+       
+       <div className="summary-grid" style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px'}}>
+           <div style={{background: '#333', padding: '15px', borderRadius: '10px'}}>
+               <div style={{color: '#888', fontSize: '12px'}}>Espacio a Liberar</div>
+               <div style={{color: '#00C851', fontSize: '24px', fontWeight: 'bold'}}>{analysis?.spaceRecoverableMB || 0} MB</div>
+           </div>
+           <div style={{background: '#333', padding: '15px', borderRadius: '10px'}}>
+               <div style={{color: '#888', fontSize: '12px'}}>Archivos Basura</div>
+               <div style={{color: '#ffbb33', fontSize: '24px', fontWeight: 'bold'}}>{analysis?.fileCount || 0}</div>
+           </div>
+       </div>
+       
+       {analysis?.message && (
+           <div className="ai-insight" style={{background: 'rgba(0, 200, 81, 0.1)', padding: '15px', borderRadius: '10px', marginBottom: '25px', textAlign: 'left', borderLeft: '3px solid #00C851'}}>
+               <h4 style={{margin: '0 0 5px 0', fontSize: '14px', color: '#00C851'}}>🤖 Análisis IA</h4>
+               <p style={{margin: 0, fontSize: '13px', color: '#ddd'}}>{analysis.message}</p>
+           </div>
+       )}
+
+       <div className="actions" style={{display: 'flex', gap: '15px', justifyContent: 'center'}}>
+           <button 
+               onClick={() => setPhase('idle')}
+               style={{...buttonStyle, background: 'transparent', border: '1px solid #666', boxShadow: 'none'}}
+           >
+               Cancelar
+           </button>
+           <button 
+               onClick={handleStartOptimization}
+               style={buttonStyle}
+           >
+               LIMPIAR AHORA
+           </button>
+       </div>
+    </div>
+  );
+
+  return (
         <div style={{ background: '#333', padding: '10px', borderRadius: '5px', marginBottom: '10px', fontSize: '13px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                 <span style={{ color: '#00C851', fontWeight: 'bold' }}>Limpieza</span>
@@ -285,100 +324,94 @@ function App() {
             </button>
         )}
 
-        {/* Stats Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', width: '100%', maxWidth: '400px', marginBottom: '30px' }}>
-            <StatCard label="CPU" value={`${stats.cpu}%`} />
-            <StatCard label="RAM" value={`${stats.ram}%`} />
-            <StatCard label="DISK" value={`${stats.disk}%`} />
+      {phase === 'idle' && (
+        <div className="dashboard">
+          <div className="stats-grid">
+            <div className="stat-card">
+              <h3>CPU</h3>
+              <div className="value">{stats.cpu}%</div>
+              <div className="bar"><div style={{width: `${stats.cpu}%`}}></div></div>
+            </div>
+            <div className="stat-card">
+              <h3>RAM</h3>
+              <div className="value">{stats.ram}%</div>
+              <div className="bar"><div style={{width: `${stats.ram}%`}}></div></div>
+            </div>
+            <div className="stat-card">
+              <h3>DISCO</h3>
+              <div className="value">{stats.disk}%</div>
+              <div className="bar"><div style={{width: `${stats.disk}%`}}></div></div>
+            </div>
+          </div>
+
+          <div className="action-area">
+             <button className="btn-primary big-btn" onClick={handleAnalyze}>
+                ANALIZAR SISTEMA
+             </button>
+             <div className="history-link">
+                <button onClick={toggleReports} style={{background:'none', border:'none', color:'#888', cursor:'pointer', textDecoration:'underline'}}>
+                    {showReports ? 'Ocultar Historial' : 'Ver Historial de Limpiezas'}
+                </button>
+             </div>
+          </div>
+          
+          {showReports && (
+              <div className="reports-history" style={{marginTop: '20px', maxHeight: '200px', overflowY: 'auto'}}>
+                  {reportsHistory.map((r, i) => (
+                      <ReportItem key={i} report={r} />
+                  ))}
+              </div>
+          )}
         </div>
+      )}
 
-        {/* Phase: IDLE */}
-        {phase === 'idle' && (
-            <button 
-                onClick={handleAnalyze} 
-                style={buttonStyle}
-            >
-                Analizar PC
-            </button>
-        )}
+      {(phase === 'analyzing' || phase === 'cleaning') && (
+        <div className="progress-view">
+           <h2>{phase === 'analyzing' ? 'Analizando Sistema...' : 'Optimizando...'}</h2>
+           <div className="progress-container">
+              <div className="progress-bar" style={{width: `${progress.percent}%`}}></div>
+           </div>
+           <div className="progress-status">
+               <span>{progress.status || (phase === 'analyzing' ? 'Escaneando archivos...' : 'Eliminando basura...')}</span>
+               <span>{progress.percent}%</span>
+           </div>
+           <div style={{ fontSize: '12px', color: '#666', marginTop: '5px', height: '20px', overflow: 'hidden' }}>
+               {progress.currentFile ? `Procesando: ${progress.currentFile.slice(-40)}` : 'Iniciando motor...'}
+           </div>
+        </div>
+      )}
 
-        {/* Phase: ANALYZING */}
-        {phase === 'analyzing' && (
-            <div style={{ textAlign: 'center', width: '100%', maxWidth: '400px' }}>
-                <p style={{ marginBottom: '15px' }}>Escaneando sistema...</p>
-                <div className="spinner" style={{ margin: '0 auto 20px auto' }}></div>
-                
-                {/* Progress Detail */}
-                <div style={{ fontSize: '12px', color: '#888', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', background: '#222', padding: '8px', borderRadius: '4px' }}>
-                    {progress.currentFile || 'Inicializando...'}
-                </div>
-            </div>
-        )}
+      {phase === 'confirmation' && renderConfirmation()}
 
-        {/* Phase: CONFIRMATION */}
-        {phase === 'confirmation' && analysis && (
-            <div style={cardStyle}>
-                <h3>Análisis Completado</h3>
-                <div style={{ margin: '15px 0', textAlign: 'left' }}>
-                    <p>📦 Espacio recuperable: <b>{analysis.spaceRecoverableMB} MB</b></p>
-                    <p>🚀 Mejora estimada: <b>{analysis.estimatedPerformanceGain}%</b></p>
-                    <p>🗑️ Archivos a eliminar: <b>{analysis.fileCount}</b></p>
-                    {analysis.readOnlyFiles.length > 0 && (
-                        <p style={{ color: '#ffbb33' }}>⚠️ {analysis.readOnlyFiles.length} archivos de solo lectura detectados.</p>
-                    )}
+      {phase === 'complete' && report && (
+        <div className="complete-view">
+           <div className="success-icon">✨</div>
+           <h2>¡Optimización Completada!</h2>
+           <div className="result-summary">
+               <div className="result-item">
+                   <span>Espacio Liberado</span>
+                   <strong>{report.freedMB} MB</strong>
+               </div>
+               <div className="result-item">
+                   <span>Archivos Eliminados</span>
+                   <strong>{report.filesDeleted}</strong>
+               </div>
+           </div>
+           
+           <div style={{ marginTop: '20px' }}>
+                <h4 style={{ fontSize: '14px', color: '#ccc', textAlign: 'left' }}>Categorías Afectadas:</h4>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
+                    {Object.keys(analysis?.categories || {}).map(cat => (
+                        <span key={cat} style={{ background: '#333', padding: '5px 10px', borderRadius: '15px', fontSize: '11px', color: '#00C851' }}>
+                            ✓ {cat}
+                        </span>
+                    ))}
                 </div>
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                    <button onClick={() => setPhase('idle')} style={{ ...buttonStyle, background: '#444' }}>Cancelar</button>
-                    <button onClick={handleStartOptimization} style={buttonStyle}>Optimizar Ahora</button>
-                </div>
-            </div>
-        )}
+           </div>
 
-        {/* Phase: CLEANING */}
-        {phase === 'cleaning' && (
-            <div style={{ width: '100%', maxWidth: '400px', textAlign: 'center' }}>
-                <p style={{ marginBottom: '10px' }}>Optimizando tu equipo...</p>
-                
-                {/* Progress Bar Container */}
-                <div style={{ width: '100%', height: '10px', background: '#333', borderRadius: '5px', overflow: 'hidden', marginBottom: '10px' }}>
-                    <div style={{ 
-                        width: `${progress.percent}%`, 
-                        height: '100%', 
-                        background: 'linear-gradient(90deg, #00C851, #007bff)',
-                        transition: 'width 0.3s ease' 
-                    }}></div>
-                </div>
-                
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#888' }}>
-                    <span>{progress.percent}%</span>
-                    <span style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {progress.currentFile}
-                    </span>
-                </div>
-            </div>
-        )}
-
-        {/* Phase: COMPLETE */}
-        {phase === 'complete' && report && (
-            <div style={cardStyle}>
-                <h3 style={{ color: '#00C851' }}>¡Optimización Exitosa!</h3>
-                <div style={{ margin: '15px 0', textAlign: 'left' }}>
-                    <p>✅ Espacio liberado: <b>{report.freedMB} MB</b></p>
-                    <p>⏱️ Tiempo total: <b>{report.duration}s</b></p>
-                    <p>📂 Archivos eliminados: <b>{report.filesDeleted}</b></p>
-                </div>
-                
-                <div style={{ background: '#2a2a2a', padding: '10px', borderRadius: '5px', fontSize: '13px', marginBottom: '15px' }}>
-                    <strong>🤖 CleanMate AI:</strong>
-                    <p style={{ marginTop: '5px', color: '#ccc' }}>{aiResponse}</p>
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                    <button onClick={downloadReport} style={{ ...buttonStyle, background: '#444', fontSize: '14px', padding: '10px 20px' }}>Descargar Reporte</button>
-                    <button onClick={() => setPhase('idle')} style={{ ...buttonStyle, fontSize: '14px', padding: '10px 20px' }}>Finalizar</button>
-                </div>
-            </div>
-        )}
+           <button className="btn-primary" onClick={() => setPhase('idle')}>Volver al Inicio</button>
+        </div>
+      )}
 
       </div>
     </div>

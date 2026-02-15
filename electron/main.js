@@ -131,7 +131,7 @@ app.whenReady().then(() => {
     });
 
     ipcMain.handle('run-cleanup', async (event) => {
-        log.info('IPC: run-cleanup called');
+        log.info('IPC: run-cleanup called', { timestamp: new Date().toISOString() });
         const onProgress = (data) => {
             if (mainWindow && !mainWindow.isDestroyed()) {
                 mainWindow.webContents.send('cleanup-progress', data);
@@ -184,7 +184,10 @@ app.whenReady().then(() => {
         // We use the alias 'scanJunk' which maps to 'analyzeSystem' from cleaner.js
         // cleaner.js analyzeSystem signature is (onProgress)
         const junkResults = await scanJunk(onProgress);
-        log.info(`Scan complete. Found ${junkResults.fileCount} files.`);
+        log.info('Scan complete', { 
+            fileCount: junkResults.fileCount, 
+            spaceRecoverableMB: junkResults.spaceRecoverableMB 
+        });
         
         // 3. Ask AI for analysis
         const cleanupStats = { 
