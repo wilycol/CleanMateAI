@@ -1,6 +1,6 @@
 {
   "name": "cleanmate-ai",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "CleanMate AI - Windows Optimizer with AI Intelligence",
   "main": "electron/main.js",
   "scripts": {

@@ -83,7 +83,7 @@ async function processUserMessage(message, mode = 'analysis') {
     };
     await saveChatEntry(userEntry);
 
-    const aiResponse = await generateAIResponse(message, context);
+    const aiResponse = await grokChatResponse(message, context);
 
     // 4. Save Assistant Message
     const assistantEntry = {
@@ -104,6 +104,58 @@ async function processUserMessage(message, mode = 'analysis') {
     });
 
     return assistantEntry;
+}
+
+async function grokChatResponse(userMsg, context) {
+    const msg = (userMsg || "").toLowerCase();
+
+    const isAnalyze = /\b(analizar|analisis|análisis|escanear|escaneo|scanear|diagnostico|diagnóstico)\b/.test(msg);
+    const isClean = /\b(limpiar|limpieza|borrar|eliminar|optimizar|optimizacion|optimización|basura)\b/.test(msg);
+
+    let actionSuggestion = null;
+
+    if (isClean) {
+        if (context.lastAnalysis && context.lastAnalysis.recoverableMB > 0) {
+            actionSuggestion = {
+                type: 'clean',
+                targets: ['temp', 'cache_chrome', 'cache_edge'],
+                label: 'Optimizar sistema',
+                description: 'Ejecutar optimización basada en el último análisis'
+            };
+        } else {
+            actionSuggestion = {
+                type: 'analyze',
+                label: 'Analizar antes de optimizar',
+                description: 'Realizar un análisis inicial del sistema'
+            };
+        }
+    } else if (isAnalyze) {
+        actionSuggestion = {
+            type: 'analyze',
+            label: 'Analizar sistema',
+            description: 'Ejecutar análisis desde el chat'
+        };
+    }
+
+    let response = "";
+
+    try {
+        const apiResult = await chatWithAI(userMsg, context);
+        const choice = apiResult && apiResult.choices && apiResult.choices[0];
+        if (choice && choice.message && typeof choice.message.content === 'string') {
+            response = choice.message.content;
+        } else {
+            response = "En este momento no pude obtener una respuesta válida de la IA.";
+        }
+    } catch (e) {
+        log.error('Fallo en chatWithAI', e);
+        response = "No pude conectar con el servicio de IA en este momento.";
+    }
+
+    return {
+        response,
+        actionSuggestion
+    };
 }
 
 // Mock AI Logic - Enhanced with "Natural Persona" and Context Awareness
