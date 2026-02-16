@@ -9,13 +9,11 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)  # Permitir peticiones desde cualquier origen (ajustar en producción)
 
-# Configuración de Grok
 GROK_API_KEY = os.getenv("GROK_API_KEY")
 GROK_API_URL = "https://api.x.ai/v1/chat/completions"
 
-# Configuración de Gemini
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash-latest")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
 GEMINI_OPENAI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 
 AGENT_PROMPT = """
@@ -51,6 +49,7 @@ Reglas de comportamiento:
 def _call_gemini_openai(messages, max_tokens=500, timeout=10):
     if not GEMINI_API_KEY:
         raise RuntimeError("GEMINI_API_KEY no configurada")
+    app.logger.info(f"Gemini request model={GEMINI_MODEL}")
     payload = {
         "model": GEMINI_MODEL,
         "messages": messages,
@@ -68,7 +67,8 @@ def _call_gemini_openai(messages, max_tokens=500, timeout=10):
 def _call_grok(messages, max_tokens=500, timeout=10):
     if not GROK_API_KEY:
         raise RuntimeError("GROK_API_KEY no configurada")
-    grok_model = os.getenv("GROK_MODEL", "grok-2-mini")
+    grok_model = os.getenv("GROK_MODEL", "grok-3-mini")
+    app.logger.info(f"Grok request model={grok_model}")
     payload = {
         "model": grok_model,
         "messages": messages,
