@@ -97,6 +97,7 @@ function App() {
   const [showReports, setShowReports] = useState(false);
   const [aiResponse, setAiResponse] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [appVersion, setAppVersion] = useState('');
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -105,6 +106,10 @@ function App() {
     };
 
     fetchStats();
+    window.electronAPI.getAppVersion()
+      .then((version) => setAppVersion(version))
+      .catch((e) => console.error('Error obteniendo versión de la app', e));
+
     const interval = setInterval(fetchStats, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -229,15 +234,20 @@ function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#1a1a1a', color: 'white', fontFamily: 'Segoe UI, sans-serif' }}>
       {/* Title Bar */}
-      <div className="title-bar" style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px', WebkitAppRegion: 'drag' }}>
-        <button onClick={toggleReports} style={{ background: 'none', border: 'none', color: showReports ? '#00C851' : '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', fontSize: '16px', marginRight: '10px' }} title="Historial de Reportes">
-            🕒
-        </button>
-        <button onClick={() => setIsChatOpen(!isChatOpen)} style={{ background: 'none', border: 'none', color: isChatOpen ? '#00C851' : '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', fontSize: '16px', marginRight: '10px' }} title="Chat AI">
-            🤖
-        </button>
-        <button onClick={() => window.electronAPI.minimize()} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', fontSize: '16px' }}>_</button>
-        <button onClick={() => window.electronAPI.close()} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', marginLeft: '10px', fontSize: '16px' }}>X</button>
+      <div className="title-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', WebkitAppRegion: 'drag' }}>
+        <div style={{ fontSize: '11px', color: '#888', WebkitAppRegion: 'no-drag' }}>
+          CleanMate AI {appVersion ? `v${appVersion}` : ''}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <button onClick={toggleReports} style={{ background: 'none', border: 'none', color: showReports ? '#00C851' : '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', fontSize: '16px', marginRight: '10px' }} title="Historial de Reportes">
+              🕒
+          </button>
+          <button onClick={() => setIsChatOpen(!isChatOpen)} style={{ background: 'none', border: 'none', color: isChatOpen ? '#00C851' : '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', fontSize: '16px', marginRight: '10px' }} title="Chat AI">
+              🤖
+          </button>
+          <button onClick={() => window.electronAPI.minimize()} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', fontSize: '16px' }}>_</button>
+          <button onClick={() => window.electronAPI.close()} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', marginLeft: '10px', fontSize: '16px' }}>X</button>
+        </div>
       </div>
 
       <AIChat 

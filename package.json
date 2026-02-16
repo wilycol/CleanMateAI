@@ -53,7 +53,7 @@
       "createStartMenuShortcut": true
     },
     "directories": {
-      "output": "build_output_clean"
+      "output": "dist"
     },
     "files": [
       "build_output_clean/**/*",

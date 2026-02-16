@@ -130,6 +130,10 @@ app.whenReady().then(() => {
         return await getSystemStats();
     });
 
+    ipcMain.handle('get-app-version', async () => {
+        return app.getVersion();
+    });
+
     ipcMain.handle('run-cleanup', async (event) => {
         log.info('IPC: run-cleanup called', { timestamp: new Date().toISOString() });
         const onProgress = (data) => {
