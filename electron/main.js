@@ -219,7 +219,14 @@ app.whenReady().then(() => {
              });
         }
 
-        const aiResult = await askAI(stats, cleanupStats);
+        // Consultar IA con timeout controlado para evitar bloqueo de UI en frío de backend
+        const aiResult = await Promise.race([
+            askAI(stats, cleanupStats),
+            new Promise(resolve => setTimeout(() => resolve({
+                choices: [{ message: { content: null } }],
+                timeout: true
+            }), 9000))
+        ]);
         
         // Merge results: AI result + Local Scan stats
         const finalResult = {
@@ -301,7 +308,7 @@ app.whenReady().then(() => {
             };
             const junkResults = await scanJunk(onProgress);
             
-            // 3. AI
+            // 3. AI con timeout
             if (mainWindow && !mainWindow.isDestroyed()) {
                  mainWindow.webContents.send('cleanup-progress', {
                      percent: 100,
@@ -309,7 +316,13 @@ app.whenReady().then(() => {
                  });
             }
             const cleanupStats = { freedMB: junkResults.spaceRecoverableMB, filesDeleted: junkResults.fileCount };
-            const aiResult = await askAI(stats, cleanupStats);
+            const aiResult = await Promise.race([
+                askAI(stats, cleanupStats),
+                new Promise(resolve => setTimeout(() => resolve({
+                    choices: [{ message: { content: null } }],
+                    timeout: true
+                }), 9000))
+            ]);
             
             const finalResult = {
                 ...aiResult,

@@ -20,7 +20,7 @@ async function analyzeSystem(systemStats, cleanupStats) {
             }
         };
 
-        const response = await axios.post(API_ANALYZE_URL, payload);
+        const response = await axios.post(API_ANALYZE_URL, payload, { timeout: 8000 });
         log.info('AI Response received successfully');
         return response.data;
     } catch (error) {
@@ -49,7 +49,7 @@ async function chatWithAI(message, context) {
             context
         };
 
-        const response = await axios.post(API_CHAT_URL, payload);
+        const response = await axios.post(API_CHAT_URL, payload, { timeout: 8000 });
         log.info('Chat AI response received successfully');
         return response.data;
     } catch (error) {
