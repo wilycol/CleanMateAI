@@ -87,9 +87,17 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
     };
 
     const handleClearHistory = async () => {
-        await window.electronAPI.chatClearHistory();
-        setMessages([]);
-        loadHistory(); // Reload greeting
+        try {
+            const ok = await window.electronAPI.chatClearHistory();
+            if (ok === false) {
+                setMessages(prev => [...prev, { role: 'assistant', message: "No pude borrar el historial de chat. Reintenta o revisa permisos." }]);
+                return;
+            }
+            setMessages([]);
+            await loadHistory(); // Reload greeting
+        } catch (e) {
+            setMessages(prev => [...prev, { role: 'assistant', message: "Error al borrar historial (IPC)." }]);
+        }
     };
 
     const startVoiceInput = () => {

@@ -75,7 +75,9 @@ async function checkAIConnectivity() {
         backend: false,
         analyze: false,
         chat: false,
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
+        lastChatError: null,
+        lastAnalyzeError: null
     };
 
     const isReachable = (err) => {
@@ -89,11 +91,11 @@ async function checkAIConnectivity() {
             result.chat = true;
         } else {
             result.chat = false;
+            result.lastChatError = 'Respuesta vacía o fallback';
         }
     } catch (e) {
-        if (isReachable(e)) {
-            result.chat = false;
-        }
+        result.chat = false;
+        result.lastChatError = e && e.response && e.response.data ? JSON.stringify(e.response.data) : (e && e.message ? e.message : 'unknown');
         log.warn('Connectivity check (chat) failed:', e.message);
     }
 
@@ -108,6 +110,7 @@ async function checkAIConnectivity() {
         if (isReachable(e)) {
             result.analyze = true;
         }
+        result.lastAnalyzeError = e && e.response && e.response.data ? JSON.stringify(e.response.data) : (e && e.message ? e.message : 'unknown');
         log.warn('Connectivity check (analyze) failed:', e.message);
     }
 

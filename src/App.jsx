@@ -68,7 +68,7 @@ function App() {
   const [aiResponse, setAiResponse] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [appVersion, setAppVersion] = useState('');
-  const [aiStatus, setAiStatus] = useState({ backend: null, analyze: null, chat: null, lastChecked: null });
+  const [aiStatus, setAiStatus] = useState({ backend: null, analyze: null, chat: null, lastChecked: null, lastChatError: null, lastAnalyzeError: null });
 
   console.log("🔥 RENDERER ACTIVO - App.jsx cargado correctamente");
 
@@ -301,10 +301,10 @@ function App() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {/* Indicadores de conectividad */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', WebkitAppRegion: 'no-drag' }}>
-            <div title={`Backend: ${aiStatus.backend === null ? 'N/D' : aiStatus.backend ? 'Conectado' : 'Desconectado'}`}
+            <div title={`API: ${aiStatus.backend === null ? 'N/D' : aiStatus.backend ? 'Conectado' : `Desconectado${aiStatus.lastAnalyzeError ? ' - ' + aiStatus.lastAnalyzeError : ''}`}`}
                  style={{ width: 10, height: 10, borderRadius: '50%', background: aiStatus.backend === null ? '#555' : aiStatus.backend ? '#00C851' : '#ff4444' }} />
             <span style={{ fontSize: 11, color: '#888' }}>API</span>
-            <div title={`IA Chat: ${aiStatus.chat === null ? 'N/D' : aiStatus.chat ? 'Conectado' : 'Desconectado'}`}
+            <div title={`IA Chat: ${aiStatus.chat === null ? 'N/D' : aiStatus.chat ? 'Conectado' : `Desconectado${aiStatus.lastChatError ? ' - ' + aiStatus.lastChatError : ''}`}`}
                  style={{ width: 10, height: 10, borderRadius: '50%', background: aiStatus.chat === null ? '#555' : aiStatus.chat ? '#00C851' : '#ff4444' }} />
             <span style={{ fontSize: 11, color: '#888' }}>IA</span>
           </div>
