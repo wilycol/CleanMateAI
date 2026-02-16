@@ -11,9 +11,12 @@ const HISTORY_FILE = path.join(app.getPath('userData'), 'chat-history.json');
 const METRICS_FILE = path.join(app.getPath('userData'), 'ai-metrics.json');
 const MAX_HISTORY = 50;
 
-// Initialize history file
-if (!fs.existsSync(HISTORY_FILE)) {
-    fs.writeJsonSync(HISTORY_FILE, []);
+try {
+    if (!fs.existsSync(HISTORY_FILE)) {
+        fs.writeJsonSync(HISTORY_FILE, []);
+    }
+} catch (e) {
+    log.error('Failed to initialize chat history file', e);
 }
 
 async function logAIMetrics(entry) {
@@ -58,7 +61,11 @@ async function saveChatEntry(entry) {
 }
 
 async function clearChatHistory() {
-    await fs.writeJson(HISTORY_FILE, []);
+    try {
+        await fs.writeJson(HISTORY_FILE, []);
+    } catch (e) {
+        log.error('Failed to clear chat history', e);
+    }
 }
 
 async function processUserMessage(message, mode = 'analysis') {
@@ -160,7 +167,7 @@ async function grokChatResponse(userMsg, context) {
 
 // Mock AI Logic - Enhanced with "Natural Persona" and Context Awareness
 async function generateAIResponse(userMsg, context) {
-    const msg = userMsg.toLowerCase();
+    const msg = (userMsg || "").toLowerCase();
     
     // --- 1. Intent Detection Helper ---
     const isGreeting = /\b(hola|buenos|buenas|hey|que tal)\b/.test(msg);
@@ -175,7 +182,8 @@ async function generateAIResponse(userMsg, context) {
     const isStrongClean = isClean && hasExecuteVerb;
 
     // --- 2. Persona & Context Variables ---
-    const { cpuLoad, ramUsed, diskUsed } = context.systemMetrics;
+    const metrics = context && context.systemMetrics ? context.systemMetrics : { cpuLoad: 0, ramUsed: 0, diskUsed: 0 };
+    const { cpuLoad, ramUsed, diskUsed } = metrics;
     const cpuHigh = cpuLoad > 80;
     const ramHigh = ramUsed > 80;
     const diskFull = diskUsed > 90;
@@ -272,7 +280,13 @@ async function generateAIResponse(userMsg, context) {
     } else if (isHistory) {
         if (context.reports && context.reports.length > 0) {
             const last = context.reports[0];
-            response = `Haciendo memoria... 🤔\n\nLa última vez (el ${new Date(last.timestamp).toLocaleDateString()}) eliminamos **${last.stats.filesDeleted} archivos** y recuperamos **${last.stats.freedMB} MB**. ¡Fue un buen trabajo!`;
+            if (last.type === 'cleanup' && last.stats) {
+                response = `Haciendo memoria... 🤔\n\nLa última vez (el ${new Date(last.timestamp).toLocaleDateString()}) eliminamos **${last.stats.filesDeleted} archivos** y recuperamos **${last.stats.freedMB} MB**. ¡Fue un buen trabajo!`;
+            } else {
+                const detectedMB = last.stats?.spaceRecoverableMB ?? 0;
+                const detectedFiles = last.stats?.fileCount ?? 0;
+                response = `Revisando registros... 📚\n\nEn el último análisis (el ${new Date(last.timestamp).toLocaleDateString()}) detectamos aproximadamente **${detectedMB} MB** potencialmente recuperables en **${detectedFiles} archivos**.`;
+            }
         } else {
             response = "Aún no tenemos historias de batallas pasadas. ¡Esta podría ser nuestra primera victoria contra los archivos basura! ¿Empezamos?";
             actionSuggestion = { type: 'analyze', label: 'Iniciar Misión', description: 'Primer análisis' };
@@ -314,14 +328,15 @@ module.exports = {
 
 async function generateGreeting(mode = 'analysis') {
     const context = await buildSystemContext(mode);
+    const metrics = context.systemMetrics || { cpuLoad: 0, ramUsed: 0, diskUsed: 0 };
     let greeting = `Hola. Estoy listo para asistirte en modo ${mode === 'optimization' ? 'Optimización' : mode === 'hardware' ? 'Hardware' : 'Análisis'}.`;
 
-    if (context.systemMetrics.diskUsed > 90) {
-        greeting += ` ⚠️ Atención: Tu disco está al ${context.systemMetrics.diskUsed}%. Te sugiero liberar espacio urgentemente.`;
+    if (metrics.diskUsed > 90) {
+        greeting += ` ⚠️ Atención: Tu disco está al ${metrics.diskUsed}%. Te sugiero liberar espacio urgentemente.`;
     } else if (context.lastAnalysis && context.lastAnalysis.recoverableMB > 1000) {
         greeting += ` Detecté ${context.lastAnalysis.recoverableMB} MB recuperables del último análisis. ¿Procedemos?`;
     } else {
-        greeting += ` Tu sistema parece estable (CPU: ${context.systemMetrics.cpuLoad}%, RAM: ${context.systemMetrics.ramUsed}%). ¿En qué puedo ayudarte hoy?`;
+        greeting += ` Tu sistema parece estable (CPU: ${metrics.cpuLoad}%, RAM: ${metrics.ramUsed}%). ¿En qué puedo ayudarte hoy?`;
     }
 
     return greeting;

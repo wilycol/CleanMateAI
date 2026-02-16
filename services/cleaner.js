@@ -173,6 +173,8 @@ async function analyzeSystem(onProgress) {
 
     // Identify recoverable space (all found files are potentially recoverable in this context)
     const recoverableMB = (totalSize / (1024 * 1024)).toFixed(2);
+    const spaceRecoverableMB = parseFloat(recoverableMB);
+    const estimatedPerformanceGain = Math.min(100, Math.ceil(spaceRecoverableMB / 100));
 
     return {
         totalSize,
@@ -180,38 +182,11 @@ async function analyzeSystem(onProgress) {
         fileCount: allFiles.length,
         categories,
         topFiles,
-        files: allFiles // Return all for cleaning phase reference
-    };
-}
-        if (onProgress) onProgress({ status: 'scanning', currentFile: p, percent: 0 });
-        
-        const result = await getFilesRecursively(p, (currentFile) => {
-            scannedCount++;
-            if (onProgress && scannedCount % 10 === 0) { // Throttle updates
-                onProgress({ 
-                    status: 'scanning', 
-                    currentFile: currentFile,
-                    percent: 0 // Unknown total yet
-                });
-            }
-        });
-        
-        totalSize += result.size;
-        filesToDelete = [...filesToDelete, ...result.files];
-        readOnlyFiles = [...readOnlyFiles, ...result.readOnly];
-    }
-
-    const spaceRecoverableMB = parseFloat((totalSize / (1024 * 1024)).toFixed(2));
-    const estimatedTimeSeconds = Math.ceil(filesToDelete.length * 0.05); 
-    const estimatedPerformanceGain = Math.min(100, Math.ceil(spaceRecoverableMB / 100)); 
-
-    return {
+        files: allFiles, // Return all for cleaning phase reference
         spaceRecoverableMB,
         estimatedPerformanceGain,
-        estimatedTimeSeconds,
-        filesToDelete: filesToDelete.map(f => f.path),
-        readOnlyFiles: readOnlyFiles.map(f => f.path),
-        fileCount: filesToDelete.length
+        readOnlyFiles: [],
+        filesToDelete: allFiles.map(f => f.path)
     };
 }
 

@@ -9,6 +9,8 @@ const { processUserMessage, getChatHistory, clearChatHistory } = require('../ser
 const { updateLastAnalysis, updateLastCleanup } = require('../services/systemContextBuilder');
 const { interpretAction } = require('../services/actionInterpreter');
 
+console.log("🔥 MAIN PROCESS ACTIVO - main.js ejecutándose");
+
 // Configure Logging
 log.initialize();
 log.transports.file.level = 'info';
@@ -220,6 +222,22 @@ app.whenReady().then(() => {
         };
 
         updateLastAnalysis(finalResult);
+        try {
+            await saveReport({
+                type: 'analysis',
+                stats: {
+                    spaceRecoverableMB: junkResults.spaceRecoverableMB,
+                    fileCount: junkResults.fileCount
+                },
+                ai: {
+                    message: finalResult.choices && finalResult.choices[0] && finalResult.choices[0].message
+                        ? finalResult.choices[0].message.content
+                        : null
+                }
+            });
+        } catch (e) {
+            log.error('Failed to auto-save analysis report:', e);
+        }
         return finalResult;
     });
 

@@ -5,55 +5,25 @@ const ReportItem = ({ report }) => {
     const [expanded, setExpanded] = useState(false);
     const errors = report.stats?.errors || [];
     const hasErrors = errors.length > 0;
+    const typeLabel = report.type === 'analysis' ? 'Análisis' : 'Limpieza';
+    const mainStatLabel = report.type === 'analysis' ? 'Espacio Detectado' : 'Espacio Liberado';
+    const mainStatValue = report.type === 'analysis'
+        ? (report.stats?.spaceRecoverableMB || 0)
+        : (report.stats?.freedMB || 0);
+    const filesLabel = report.type === 'analysis' ? 'Archivos Detectados' : 'Archivos Eliminados';
+    const filesValue = report.type === 'analysis'
+        ? (report.stats?.fileCount || 0)
+        : (report.stats?.filesDeleted || 0);
 
-    const renderConfirmation = () => (
-    <div className="confirmation-view" style={cardStyle}>
-       <h2 style={{marginBottom: '20px'}}>Análisis Completado</h2>
-       
-       <div className="summary-grid" style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px'}}>
-           <div style={{background: '#333', padding: '15px', borderRadius: '10px'}}>
-               <div style={{color: '#888', fontSize: '12px'}}>Espacio a Liberar</div>
-               <div style={{color: '#00C851', fontSize: '24px', fontWeight: 'bold'}}>{analysis?.spaceRecoverableMB || 0} MB</div>
-           </div>
-           <div style={{background: '#333', padding: '15px', borderRadius: '10px'}}>
-               <div style={{color: '#888', fontSize: '12px'}}>Archivos Basura</div>
-               <div style={{color: '#ffbb33', fontSize: '24px', fontWeight: 'bold'}}>{analysis?.fileCount || 0}</div>
-           </div>
-       </div>
-       
-       {analysis?.message && (
-           <div className="ai-insight" style={{background: 'rgba(0, 200, 81, 0.1)', padding: '15px', borderRadius: '10px', marginBottom: '25px', textAlign: 'left', borderLeft: '3px solid #00C851'}}>
-               <h4 style={{margin: '0 0 5px 0', fontSize: '14px', color: '#00C851'}}>🤖 Análisis IA</h4>
-               <p style={{margin: 0, fontSize: '13px', color: '#ddd'}}>{analysis.message}</p>
-           </div>
-       )}
-
-       <div className="actions" style={{display: 'flex', gap: '15px', justifyContent: 'center'}}>
-           <button 
-               onClick={() => setPhase('idle')}
-               style={{...buttonStyle, background: 'transparent', border: '1px solid #666', boxShadow: 'none'}}
-           >
-               Cancelar
-           </button>
-           <button 
-               onClick={handleStartOptimization}
-               style={buttonStyle}
-           >
-               LIMPIAR AHORA
-           </button>
-       </div>
-    </div>
-  );
-
-  return (
+    return (
         <div style={{ background: '#333', padding: '10px', borderRadius: '5px', marginBottom: '10px', fontSize: '13px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                <span style={{ color: '#00C851', fontWeight: 'bold' }}>Limpieza</span>
+                <span style={{ color: '#00C851', fontWeight: 'bold' }}>{typeLabel}</span>
                 <span style={{ color: '#888' }}>{new Date(report.timestamp).toLocaleString()}</span>
             </div>
             <div style={{ color: '#ccc' }}>
-                <div>Liberado: {report.stats?.freedMB || 0} MB</div>
-                <div>Archivos: {report.stats?.filesDeleted || 0}</div>
+                <div>{mainStatLabel}: {mainStatValue} MB</div>
+                <div>{filesLabel}: {filesValue}</div>
                 {hasErrors && (
                     <div style={{ marginTop: '5px' }}>
                         <button 
@@ -98,6 +68,8 @@ function App() {
   const [aiResponse, setAiResponse] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [appVersion, setAppVersion] = useState('');
+
+  console.log("🔥 RENDERER ACTIVO - App.jsx cargado correctamente");
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -181,7 +153,12 @@ function App() {
         const message = aiResult.choices?.[0]?.message?.content || "Optimización completada con éxito.";
         console.log("CleanMateAI | Respuesta IA", aiResult);
         setAiResponse(message);
-
+        try {
+            const history = await window.electronAPI.getReports();
+            setReportsHistory(history);
+        } catch (e) {
+            console.error("Error refreshing reports history", e);
+        }
     } catch (error) {
         console.error("CleanMateAI | Optimization failed", error);
         setPhase('idle');
@@ -230,6 +207,47 @@ function App() {
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
   };
+
+  const renderConfirmation = () => (
+    <div className="confirmation-view" style={cardStyle}>
+       <h2 style={{marginBottom: '20px'}}>Análisis Completado</h2>
+       
+       <div className="summary-grid" style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px'}}>
+           <div style={{background: '#333', padding: '15px', borderRadius: '10px'}}>
+               <div style={{color: '#888', fontSize: '12px'}}>Espacio a Liberar</div>
+               <div style={{color: '#00C851', fontSize: '24px', fontWeight: 'bold'}}>{analysis?.spaceRecoverableMB || 0} MB</div>
+           </div>
+           <div style={{background: '#333', padding: '15px', borderRadius: '10px'}}>
+               <div style={{color: '#888', fontSize: '12px'}}>Archivos Basura</div>
+               <div style={{color: '#ffbb33', fontSize: '24px', fontWeight: 'bold'}}>{analysis?.fileCount || 0}</div>
+           </div>
+       </div>
+       
+       {analysis?.message && (
+           <div className="ai-insight" style={{background: 'rgba(0, 200, 81, 0.1)', padding: '15px', borderRadius: '10px', marginBottom: '25px', textAlign: 'left', borderLeft: '3px solid #00C851'}}>
+               <h4 style={{margin: '0 0 5px 0', fontSize: '14px', color: '#00C851'}}>🤖 Análisis IA</h4>
+               <p style={{margin: 0, fontSize: '13px', color: '#ddd'}}>{analysis.message}</p>
+           </div>
+       )}
+
+       <div className="actions" style={{display: 'flex', gap: '15px', justifyContent: 'center'}}>
+           <button 
+               onClick={() => setPhase('idle')}
+               style={{...buttonStyle, background: 'transparent', border: '1px solid #666', boxShadow: 'none'}}
+           >
+               Cancelar
+           </button>
+           <button 
+               onClick={handleStartOptimization}
+               style={buttonStyle}
+           >
+               LIMPIAR AHORA
+           </button>
+       </div>
+    </div>
+  );
+
+  console.log("App renderizando correctamente sin errores críticos");
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#1a1a1a', color: 'white', fontFamily: 'Segoe UI, sans-serif' }}>
