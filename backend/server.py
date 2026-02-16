@@ -13,6 +13,11 @@ CORS(app)  # Permitir peticiones desde cualquier origen (ajustar en producción)
 GROK_API_KEY = os.getenv("GROK_API_KEY")
 GROK_API_URL = "https://api.x.ai/v1/chat/completions"
 
+# Configuración de Gemini
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = "gemini-1.5-flash"
+GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
+
 AGENT_PROMPT = """
 Eres CleanMate AI, un asistente experto en rendimiento y optimización de sistemas Windows. 
 
@@ -43,23 +48,59 @@ Reglas de comportamiento:
 9. Termina siempre con una sugerencia clara de acción.
 """
 
+def _format_openai_like(text):
+    return {"choices": [{"message": {"content": text}}]}
+
+def _call_gemini(text, timeout=10):
+    if not GEMINI_API_KEY:
+        raise RuntimeError("GEMINI_API_KEY no configurada")
+    params = {"key": GEMINI_API_KEY}
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": text}
+                ]
+            }
+        ]
+    }
+    resp = requests.post(GEMINI_API_URL, params=params, json=payload, timeout=timeout)
+    resp.raise_for_status()
+    data = resp.json()
+    candidates = data.get("candidates", [])
+    if candidates:
+        content = candidates[0].get("content", {})
+        parts = content.get("parts", [])
+        if parts and "text" in parts[0]:
+            return parts[0]["text"]
+    raise RuntimeError("Respuesta de Gemini sin contenido")
+
+def _call_grok(messages, max_tokens=500, timeout=10):
+    if not GROK_API_KEY:
+        raise RuntimeError("GROK_API_KEY no configurada")
+    payload = {
+        "model": "grok-beta",
+        "messages": messages,
+        "max_tokens": max_tokens
+    }
+    headers = {
+        "Authorization": f"Bearer {GROK_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    resp = requests.post(GROK_API_URL, json=payload, headers=headers, timeout=timeout)
+    if resp.status_code == 200:
+        return resp.json()
+    raise RuntimeError(resp.text)
+
 @app.route('/api/analyze', methods=['POST'])
 def analyze_system():
-    if not GROK_API_KEY:
-        return jsonify({"error": "Servidor no configurado correctamente (Falta API Key)"}), 500
-
     data = request.json
     
     # Validar estructura básica de entrada
     if not data or 'system_info' not in data:
         return jsonify({"error": "Datos inválidos"}), 400
 
-    # Construir el payload para Grok
-    # Aquí actuamos como proxy: recibimos los datos del cliente,
-    # construimos el prompt seguro y consultamos a Grok.
-    
     try:
-        # Reconstruir el prompt aquí para no confiar en el cliente
         system_info = data.get('system_info', {})
         cleanup_info = data.get('cleanup_info', {})
         
@@ -73,9 +114,17 @@ def analyze_system():
         Última limpieza: {cleanup_info.get('last_cleanup', 'Nunca')}
         """
 
-        payload = {
-            "model": "grok-beta",
-            "messages": [
+        combined_text = (AGENT_PROMPT.strip() + "\n\n" + prompt_content).strip()
+
+        if GEMINI_API_KEY:
+            try:
+                text = _call_gemini(combined_text)
+                return jsonify(_format_openai_like(text))
+            except Exception:
+                pass
+
+        if GROK_API_KEY:
+            messages = [
                 {
                     "role": "system",
                     "content": "Eres CleanMateAI, un experto en mantenimiento de Windows. Responde en español, breve y conciso."
@@ -84,21 +133,14 @@ def analyze_system():
                     "role": "user",
                     "content": prompt_content
                 }
-            ],
-            "max_tokens": 300
-        }
+            ]
+            try:
+                data = _call_grok(messages, max_tokens=300)
+                return jsonify(data)
+            except Exception as e:
+                return jsonify({"error": "Error al consultar IA", "details": str(e)}), 502
 
-        headers = {
-            "Authorization": f"Bearer {GROK_API_KEY}",
-            "Content-Type": "application/json"
-        }
-
-        response = requests.post(GROK_API_URL, json=payload, headers=headers)
-        
-        if response.status_code == 200:
-            return jsonify(response.json())
-        else:
-            return jsonify({"error": "Error al consultar IA", "details": response.text}), response.status_code
+        return jsonify({"error": "Servidor sin claves de IA configuradas"}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -122,9 +164,6 @@ def receive_report():
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    if not GROK_API_KEY:
-        return jsonify({"error": "Servidor no configurado correctamente (Falta API Key)"}), 500
-
     data = request.json or {}
     user_message = data.get("message", "")
     context = data.get("context", {})
@@ -168,26 +207,27 @@ Contexto técnico actual:
 Responde siguiendo estrictamente el rol y reglas del agente CleanMate AI.
 """
 
-        payload = {
-            "model": "grok-beta",
-            "messages": [
+        combined_text = (AGENT_PROMPT.strip() + "\n\n" + full_prompt).strip()
+
+        if GEMINI_API_KEY:
+            try:
+                text = _call_gemini(combined_text)
+                return jsonify(_format_openai_like(text))
+            except Exception:
+                pass
+
+        if GROK_API_KEY:
+            messages = [
                 {"role": "system", "content": AGENT_PROMPT.strip()},
                 {"role": "user", "content": full_prompt}
-            ],
-            "max_tokens": 500
-        }
+            ]
+            try:
+                data = _call_grok(messages, max_tokens=500)
+                return jsonify(data)
+            except Exception as e:
+                return jsonify({"error": "Error al consultar IA", "details": str(e)}), 502
 
-        headers = {
-            "Authorization": f"Bearer {GROK_API_KEY}",
-            "Content-Type": "application/json"
-        }
-
-        response = requests.post(GROK_API_URL, json=payload, headers=headers)
-
-        if response.status_code == 200:
-            return jsonify(response.json())
-        else:
-            return jsonify({"error": "Error al consultar IA", "details": response.text}), response.status_code
+        return jsonify({"error": "Servidor sin claves de IA configuradas"}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
