@@ -78,30 +78,39 @@ async function checkAIConnectivity() {
         lastChecked: new Date().toISOString()
     };
 
-    // Helper: consider any HTTP response (even 4xx/5xx) as "reachable"
     const isReachable = (err) => {
         return !!(err && err.response && typeof err.response.status === 'number');
     };
 
-    // 1) Check Chat endpoint (POST ping)
     try {
-        await axios.post(API_CHAT_URL, { message: '__ping__', context: { ping: true } }, { timeout: 4000 });
-        result.chat = true;
+        const res = await axios.post(API_CHAT_URL, { message: '__health_check__', context: { ping: true } }, { timeout: 5000 });
+        const content = res && res.data && res.data.choices && res.data.choices[0] && res.data.choices[0].message && res.data.choices[0].message.content;
+        if (typeof content === 'string' && content.trim().length > 0 && content.indexOf('No se pudo conectar con la IA') === -1) {
+            result.chat = true;
+        } else {
+            result.chat = false;
+        }
     } catch (e) {
-        if (isReachable(e)) result.chat = true;
+        if (isReachable(e)) {
+            result.chat = false;
+        }
         log.warn('Connectivity check (chat) failed:', e.message);
     }
 
-    // 2) Check Analyze endpoint (POST ping-like payload)
     try {
-        await axios.post(API_ANALYZE_URL, { system_info: {}, cleanup_info: {} }, { timeout: 4000 });
-        result.analyze = true;
+        const res = await axios.post(API_ANALYZE_URL, { system_info: {}, cleanup_info: {} }, { timeout: 4000 });
+        if (res && typeof res.status === 'number') {
+            result.analyze = res.status >= 200 && res.status < 500;
+        } else {
+            result.analyze = false;
+        }
     } catch (e) {
-        if (isReachable(e)) result.analyze = true;
+        if (isReachable(e)) {
+            result.analyze = true;
+        }
         log.warn('Connectivity check (analyze) failed:', e.message);
     }
 
-    // 3) Backend summary
     result.backend = result.chat || result.analyze;
     return result;
 }
