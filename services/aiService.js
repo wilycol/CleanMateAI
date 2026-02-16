@@ -62,9 +62,19 @@ async function saveChatEntry(entry) {
 
 async function clearChatHistory() {
     try {
+        await fs.ensureDir(path.dirname(HISTORY_FILE));
         await fs.writeJson(HISTORY_FILE, []);
+        return true;
     } catch (e) {
-        log.error('Failed to clear chat history', e);
+        log.error('Failed to clear chat history (writeJson)', e);
+        try {
+            await fs.remove(HISTORY_FILE);
+            await fs.writeJson(HISTORY_FILE, []);
+            return true;
+        } catch (e2) {
+            log.error('Failed to clear chat history (remove+recreate)', e2);
+            return false;
+        }
     }
 }
 
@@ -153,14 +163,16 @@ async function grokChatResponse(userMsg, context) {
     try {
         const apiResult = await chatWithAI(userMsg, context);
         const choice = apiResult && apiResult.choices && apiResult.choices[0];
-        if (choice && choice.message && typeof choice.message.content === 'string') {
+        if (choice && choice.message && typeof choice.message.content === 'string' && choice.message.content.trim()) {
             response = choice.message.content;
         } else {
-            response = "En este momento no pude obtener una respuesta válida de la IA.";
+            // Fallback local si la IA no devuelve contenido usable
+            response = await generateAIResponse(userMsg, context);
         }
     } catch (e) {
         log.error('Fallo en chatWithAI', e);
-        response = "No pude conectar con el servicio de IA en este momento.";
+        // Fallback local si la llamada remota falla
+        response = await generateAIResponse(userMsg, context);
     }
 
     return {
