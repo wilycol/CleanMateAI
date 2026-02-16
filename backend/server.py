@@ -15,7 +15,7 @@ GROK_API_URL = "https://api.x.ai/v1/chat/completions"
 
 # Configuración de Gemini
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-1.5-flash"
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash-latest")
 GEMINI_OPENAI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 
 AGENT_PROMPT = """
@@ -68,8 +68,9 @@ def _call_gemini_openai(messages, max_tokens=500, timeout=10):
 def _call_grok(messages, max_tokens=500, timeout=10):
     if not GROK_API_KEY:
         raise RuntimeError("GROK_API_KEY no configurada")
+    grok_model = os.getenv("GROK_MODEL", "grok-2-mini")
     payload = {
-        "model": "grok-beta",
+        "model": grok_model,
         "messages": messages,
         "max_tokens": max_tokens
     }
