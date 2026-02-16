@@ -16,7 +16,7 @@ GROK_API_URL = "https://api.x.ai/v1/chat/completions"
 # Configuración de Gemini
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_MODEL = "gemini-1.5-flash"
-GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
+GEMINI_OPENAI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 
 AGENT_PROMPT = """
 Eres CleanMate AI, un asistente experto en rendimiento y optimización de sistemas Windows. 
@@ -48,32 +48,22 @@ Reglas de comportamiento:
 9. Termina siempre con una sugerencia clara de acción.
 """
 
-def _format_openai_like(text):
-    return {"choices": [{"message": {"content": text}}]}
-
-def _call_gemini(text, timeout=10):
+def _call_gemini_openai(messages, max_tokens=500, timeout=10):
     if not GEMINI_API_KEY:
         raise RuntimeError("GEMINI_API_KEY no configurada")
-    params = {"key": GEMINI_API_KEY}
     payload = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": text}
-                ]
-            }
-        ]
+        "model": GEMINI_MODEL,
+        "messages": messages,
+        "max_tokens": max_tokens
     }
-    resp = requests.post(GEMINI_API_URL, params=params, json=payload, timeout=timeout)
-    resp.raise_for_status()
-    data = resp.json()
-    candidates = data.get("candidates", [])
-    if candidates:
-        content = candidates[0].get("content", {})
-        parts = content.get("parts", [])
-        if parts and "text" in parts[0]:
-            return parts[0]["text"]
-    raise RuntimeError("Respuesta de Gemini sin contenido")
+    headers = {
+        "Authorization": f"Bearer {GEMINI_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    resp = requests.post(GEMINI_OPENAI_URL, json=payload, headers=headers, timeout=timeout)
+    if resp.status_code == 200:
+        return resp.json()
+    raise RuntimeError(resp.text)
 
 def _call_grok(messages, max_tokens=500, timeout=10):
     if not GROK_API_KEY:
@@ -114,31 +104,34 @@ def analyze_system():
         Última limpieza: {cleanup_info.get('last_cleanup', 'Nunca')}
         """
 
-        combined_text = (AGENT_PROMPT.strip() + "\n\n" + prompt_content).strip()
+        messages = [
+            {
+                "role": "system",
+                "content": "Eres CleanMateAI, un experto en mantenimiento de Windows. Responde en español, breve y conciso."
+            },
+            {
+                "role": "user",
+                "content": prompt_content
+            }
+        ]
 
+        gemini_err = None
         if GEMINI_API_KEY:
             try:
-                text = _call_gemini(combined_text)
-                return jsonify(_format_openai_like(text))
-            except Exception:
-                pass
+                data = _call_gemini_openai(messages, max_tokens=300)
+                return jsonify(data)
+            except Exception as e:
+                gemini_err = str(e)
 
         if GROK_API_KEY:
-            messages = [
-                {
-                    "role": "system",
-                    "content": "Eres CleanMateAI, un experto en mantenimiento de Windows. Responde en español, breve y conciso."
-                },
-                {
-                    "role": "user",
-                    "content": prompt_content
-                }
-            ]
             try:
                 data = _call_grok(messages, max_tokens=300)
                 return jsonify(data)
             except Exception as e:
-                return jsonify({"error": "Error al consultar IA", "details": str(e)}), 502
+                return jsonify({"error": "Error al consultar IA", "details": {"gemini": gemini_err, "grok": str(e)}}), 502
+
+        if gemini_err:
+            return jsonify({"error": "Error al consultar IA", "details": {"gemini": gemini_err}}), 502
 
         return jsonify({"error": "Servidor sin claves de IA configuradas"}), 500
 
@@ -207,30 +200,62 @@ Contexto técnico actual:
 Responde siguiendo estrictamente el rol y reglas del agente CleanMate AI.
 """
 
-        combined_text = (AGENT_PROMPT.strip() + "\n\n" + full_prompt).strip()
+        messages = [
+            {"role": "system", "content": AGENT_PROMPT.strip()},
+            {"role": "user", "content": full_prompt}
+        ]
 
+        gemini_err = None
         if GEMINI_API_KEY:
             try:
-                text = _call_gemini(combined_text)
-                return jsonify(_format_openai_like(text))
-            except Exception:
-                pass
+                data = _call_gemini_openai(messages, max_tokens=500)
+                return jsonify(data)
+            except Exception as e:
+                gemini_err = str(e)
 
         if GROK_API_KEY:
-            messages = [
-                {"role": "system", "content": AGENT_PROMPT.strip()},
-                {"role": "user", "content": full_prompt}
-            ]
             try:
                 data = _call_grok(messages, max_tokens=500)
                 return jsonify(data)
             except Exception as e:
-                return jsonify({"error": "Error al consultar IA", "details": str(e)}), 502
+                return jsonify({"error": "Error al consultar IA", "details": {"gemini": gemini_err, "grok": str(e)}}), 502
+
+        if gemini_err:
+            return jsonify({"error": "Error al consultar IA", "details": {"gemini": gemini_err}}), 502
 
         return jsonify({"error": "Servidor sin claves de IA configuradas"}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/ai-health', methods=['GET'])
+def ai_health():
+    result = {"gemini": {"ok": False, "error": None}, "grok": {"ok": False, "error": None}}
+    try:
+        if GEMINI_API_KEY:
+            try:
+                _ = _call_gemini_openai([{"role": "user", "content": "__health_check__"}], max_tokens=5, timeout=6)
+                result["gemini"]["ok"] = True
+            except Exception as e:
+                result["gemini"]["error"] = str(e)
+        else:
+            result["gemini"]["error"] = "GEMINI_API_KEY no configurada"
+    except Exception as e:
+        result["gemini"]["error"] = str(e)
+
+    try:
+        if GROK_API_KEY:
+            try:
+                _ = _call_grok([{"role": "user", "content": "__health_check__"}], max_tokens=5, timeout=6)
+                result["grok"]["ok"] = True
+            except Exception as e:
+                result["grok"]["error"] = str(e)
+        else:
+            result["grok"]["error"] = "GROK_API_KEY no configurada"
+    except Exception as e:
+        result["grok"]["error"] = str(e)
+
+    return jsonify(result)
 
 @app.route('/', methods=['GET'])
 def health_check():
