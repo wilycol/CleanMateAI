@@ -4,7 +4,7 @@ const { app } = require('electron');
 const log = require('electron-log');
 const { buildSystemContext } = require('./systemContextBuilder');
 const { interpretAction } = require('./actionInterpreter');
-const { analyzeSystem: apiAnalyze } = require('./apiClient'); 
+const { chatWithAI } = require('./apiClient'); 
 const { getReports } = require('./reportManager');
 
 const HISTORY_FILE = path.join(app.getPath('userData'), 'chat-history.json');
@@ -83,8 +83,6 @@ async function processUserMessage(message, mode = 'analysis') {
     };
     await saveChatEntry(userEntry);
 
-    // 3. Call AI (Mocked for now, but structured for replacement)
-    // In a real scenario, we would send 'context' + 'message' + 'recent history' to OpenAI/Grok
     const aiResponse = await generateAIResponse(message, context);
 
     // 4. Save Assistant Message
@@ -114,12 +112,15 @@ async function generateAIResponse(userMsg, context) {
     
     // --- 1. Intent Detection Helper ---
     const isGreeting = /\b(hola|buenos|buenas|hey|que tal)\b/.test(msg);
-    const isAnalyze = /\b(analizar|escanear|buscar|verificar|estado|diagnostico)\b/.test(msg);
-    const isClean = /\b(limpiar|borrar|eliminar|optimizar|liberar|basura)\b/.test(msg);
+    const isAnalyze = /\b(analizar|analisis|análisis|escanear|escaneo|scanear|verificar|diagnostico|diagnóstico)\b/.test(msg);
+    const isClean = /\b(limpiar|limpieza|borrar|eliminar|optimizar|optimizacion|optimización|optimiza|optimice|liberar|liberacion|basura)\b/.test(msg);
     const isSlow = /\b(lento|trabado|pegado|lag|tarda|rapidez|velocidad)\b/.test(msg);
-    const isHistory = /\b(historial|reporte|anterior|pasado|ultimo)\b/.test(msg);
+    const isHistory = /\b(historial|reporte|reportes|anterior|pasado|ultimo|último)\b/.test(msg);
     const isThanks = /\b(gracias|agradecido|genial|ok|listo|bueno)\b/.test(msg);
     const isHelp = /\b(ayuda|socorro|que haces|para que sirves)\b/.test(msg);
+    const hasExecuteVerb = /\b(ejecuta|ejecutar|haz|haga|realiza|realizar|inicia|iniciar|comienza|comenzar|arranca|arrancar|aplica|aplicar|ya|ahora)\b/.test(msg);
+    const isStrongAnalyze = isAnalyze && hasExecuteVerb;
+    const isStrongClean = isClean && hasExecuteVerb;
 
     // --- 2. Persona & Context Variables ---
     const { cpuLoad, ramUsed, diskUsed } = context.systemMetrics;
@@ -138,8 +139,35 @@ async function generateAIResponse(userMsg, context) {
     let actionSuggestion = null;
 
     // --- 3. Logic Engine ---
-
-    if (isGreeting) {
+    // 3.1 Intentos fuertes: el usuario pide ejecutar directamente
+    if (isStrongClean) {
+        if (context.lastAnalysis && context.lastAnalysis.recoverableMB > 0) {
+            response = `Perfecto, voy a ejecutar la optimización ahora mismo sobre lo que ya analizamos. 🧹\n\nSi notas algo raro, siempre puedes volver a escribirme.`;
+            actionSuggestion = {
+                type: 'clean',
+                targets: ['temp', 'cache_chrome', 'cache_edge'],
+                label: 'Optimizar sistema',
+                description: `Optimización solicitada por el usuario`,
+                autoExecute: true
+            };
+        } else {
+            response = `Puedo optimizar tu sistema, pero antes necesito hacer un análisis rápido para no tocar nada sensible. Empezaré con un escaneo y luego continúo con la limpieza.`;
+            actionSuggestion = {
+                type: 'analyze',
+                label: 'Analizar y optimizar',
+                description: 'Escaneo previo antes de limpiar',
+                autoExecute: true
+            };
+        }
+    } else if (isStrongAnalyze) {
+        response = `Entendido, iniciaré un análisis completo de tu sistema ahora mismo para ver qué podemos mejorar.`;
+        actionSuggestion = {
+            type: 'analyze',
+            label: 'Iniciar análisis',
+            description: 'Análisis solicitado por el usuario',
+            autoExecute: true
+        };
+    } else if (isGreeting) {
         const status = (cpuHigh || ramHigh || diskFull) 
             ? "Veo que tu sistema está trabajando duro hoy." 
             : "Tu sistema se ve bastante tranquilo por ahora.";

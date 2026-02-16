@@ -13,6 +13,36 @@ CORS(app)  # Permitir peticiones desde cualquier origen (ajustar en producción)
 GROK_API_KEY = os.getenv("GROK_API_KEY")
 GROK_API_URL = "https://api.x.ai/v1/chat/completions"
 
+AGENT_PROMPT = """
+Eres CleanMate AI, un asistente experto en rendimiento y optimización de sistemas Windows. 
+
+No eres un bot genérico. 
+Eres un copiloto técnico inteligente, claro, humano y profesional. 
+
+Tu personalidad:
+- Inteligente pero accesible.
+- Técnica pero fácil de entender.
+- Segura pero no arrogante.
+- Natural, conversacional y fluida.
+- Nunca robótica.
+- Nunca repetitiva.
+- Nunca genérica.
+
+Tu misión:
+Analizar datos reales del sistema del usuario y ofrecer interpretación experta, recomendaciones claras y guía paso a paso.
+
+Reglas de comportamiento:
+1. Nunca repitas métricas sin interpretarlas.
+2. Siempre analiza contexto.
+3. No ejecutes acciones por tu cuenta; solo sugiere.
+4. Guía al usuario con recomendaciones claras.
+5. Organiza tus respuestas en: Diagnóstico, Interpretación, Recomendación, Próximo paso sugerido.
+6. Usa tono humano, profesional y tranquilo.
+7. Si el sistema está bien, dilo. Si hay riesgo, explícalo sin generar miedo.
+8. Tienes libertad para razonar y explicar causas probables.
+9. Termina siempre con una sugerencia clara de acción.
+"""
+
 @app.route('/api/analyze', methods=['POST'])
 def analyze_system():
     if not GROK_API_KEY:
@@ -87,6 +117,78 @@ def receive_report():
         # db.save_report(data)
         
         return jsonify({"status": "success", "message": "Report received successfully"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    if not GROK_API_KEY:
+        return jsonify({"error": "Servidor no configurado correctamente (Falta API Key)"}), 500
+
+    data = request.json or {}
+    user_message = data.get("message", "")
+    context = data.get("context", {})
+
+    try:
+        system_metrics = context.get("systemMetrics", {})
+        last_analysis = context.get("lastAnalysis")
+        last_cleanup = context.get("lastCleanup")
+        mode = context.get("mode", "analysis")
+
+        context_text = f"""
+Modo actual: {mode}
+
+Métricas del sistema:
+- CPU: {system_metrics.get('cpuLoad', 'N/A')}%
+- RAM: {system_metrics.get('ramUsed', 'N/A')}%
+- Disco usado: {system_metrics.get('diskUsed', 'N/A')}%
+- Espacio libre en disco (GB): {system_metrics.get('diskFreeGB', 'N/A')}
+"""
+        if last_analysis:
+            context_text += f"""
+Último análisis:
+- Espacio recuperable estimado (MB): {last_analysis.get('recoverableMB', 'N/A')}
+- Archivos detectados: {last_analysis.get('fileCount', 'N/A')}
+- Archivos solo lectura: {last_analysis.get('readOnlyCount', 'N/A')}
+"""
+        if last_cleanup:
+            context_text += f"""
+Última limpieza:
+- Espacio liberado (MB): {last_cleanup.get('freedMB', 'N/A')}
+- Archivos eliminados: {last_cleanup.get('filesDeleted', 'N/A')}
+"""
+
+        full_prompt = f"""
+Mensaje del usuario:
+{user_message}
+
+Contexto técnico actual:
+{context_text}
+
+Responde siguiendo estrictamente el rol y reglas del agente CleanMate AI.
+"""
+
+        payload = {
+            "model": "grok-beta",
+            "messages": [
+                {"role": "system", "content": AGENT_PROMPT.strip()},
+                {"role": "user", "content": full_prompt}
+            ],
+            "max_tokens": 500
+        }
+
+        headers = {
+            "Authorization": f"Bearer {GROK_API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        response = requests.post(GROK_API_URL, json=payload, headers=headers)
+
+        if response.status_code == 200:
+            return jsonify(response.json())
+        else:
+            return jsonify({"error": "Error al consultar IA", "details": response.text}), response.status_code
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

@@ -1,8 +1,8 @@
 const axios = require('axios');
 const log = require('electron-log');
 
-// Production URL for Render Backend
-const API_URL = 'https://cleanmateai-backend.onrender.com/api/analyze';
+const API_ANALYZE_URL = 'https://cleanmateai-backend.onrender.com/api/analyze';
+const API_CHAT_URL = 'https://cleanmateai-backend.onrender.com/api/chat';
 
 async function analyzeSystem(systemStats, cleanupStats) {
     try {
@@ -20,7 +20,7 @@ async function analyzeSystem(systemStats, cleanupStats) {
             }
         };
 
-        const response = await axios.post(API_URL, payload);
+        const response = await axios.post(API_ANALYZE_URL, payload);
         log.info('AI Response received successfully');
         return response.data;
     } catch (error) {
@@ -41,4 +41,33 @@ async function analyzeSystem(systemStats, cleanupStats) {
     }
 }
 
-module.exports = { analyzeSystem };
+async function chatWithAI(message, context) {
+    try {
+        log.info('Sending chat to AI backend...');
+        const payload = {
+            message,
+            context
+        };
+
+        const response = await axios.post(API_CHAT_URL, payload);
+        log.info('Chat AI response received successfully');
+        return response.data;
+    } catch (error) {
+        log.error('Chat API Error:', error.message);
+        if (error.response) {
+            log.error('Chat API Response Data:', error.response.data);
+            log.error('Chat API Status:', error.response.status);
+        }
+        return {
+            choices: [
+                {
+                    message: {
+                        content: "No se pudo conectar con la IA de chat. Verifique su conexión a internet."
+                    }
+                }
+            ]
+        };
+    }
+}
+
+module.exports = { analyzeSystem, chatWithAI };

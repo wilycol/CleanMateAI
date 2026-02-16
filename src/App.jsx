@@ -122,19 +122,21 @@ function App() {
   };
 
   const handleAnalyze = async () => {
+    console.log("CleanMateAI | Iniciando análisis del sistema");
     setPhase('analyzing');
     
-    // Listen for progress during analysis too
     window.electronAPI.onProgress((data) => {
+        console.log("CleanMateAI | Progreso análisis", data);
         setProgress(data);
     });
 
     try {
         const result = await window.electronAPI.analyzeSystem();
+        console.log("CleanMateAI | Análisis completado", result);
         setAnalysis(result);
         setPhase('confirmation');
     } catch (e) {
-        console.error("Analysis failed", e);
+        console.error("CleanMateAI | Analysis failed", e);
         setPhase('idle');
     } finally {
         window.electronAPI.removeProgressListeners();
@@ -142,10 +144,11 @@ function App() {
   };
 
   const handleStartOptimization = async () => {
+    console.log("CleanMateAI | Iniciando limpieza");
     setPhase('cleaning');
     
-    // Listen for progress
     window.electronAPI.onProgress((data) => {
+        console.log("CleanMateAI | Progreso limpieza", data);
         setProgress(data);
     });
 
@@ -154,27 +157,29 @@ function App() {
         const cleanupResult = await window.electronAPI.runCleanup();
         const endTime = Date.now();
         
-        // Remove listeners
         window.electronAPI.removeProgressListeners();
+
+        const duration = ((endTime - startTime) / 1000).toFixed(2);
+        console.log("CleanMateAI | Limpieza completada", { cleanupResult, duration });
 
         setReport({
             ...cleanupResult,
-            duration: ((endTime - startTime) / 1000).toFixed(2)
+            duration
         });
         setPhase('complete');
         
-        // Ask AI in background
         setAiResponse('Generando reporte inteligente...');
         const aiResult = await window.electronAPI.askAI({
             systemStats: stats,
             cleanupStats: cleanupResult
         });
         const message = aiResult.choices?.[0]?.message?.content || "Optimización completada con éxito.";
+        console.log("CleanMateAI | Respuesta IA", aiResult);
         setAiResponse(message);
 
     } catch (error) {
-        console.error("Optimization failed", error);
-        setPhase('idle'); // or error state
+        console.error("CleanMateAI | Optimization failed", error);
+        setPhase('idle');
     }
   };
 

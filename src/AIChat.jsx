@@ -86,6 +86,14 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
         }
     };
 
+    useEffect(() => {
+        const last = messages[messages.length - 1];
+        if (!last) return;
+        if (last.role === 'assistant' && last.actionSuggestion && last.actionSuggestion.autoExecute) {
+            handleExecuteAction(last.actionSuggestion);
+        }
+    }, [messages]);
+
     const handleClearHistory = async () => {
         await window.electronAPI.chatClearHistory();
         setMessages([]);
