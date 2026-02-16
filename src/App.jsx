@@ -72,13 +72,21 @@ function App() {
   console.log("🔥 RENDERER ACTIVO - App.jsx cargado correctamente");
 
   useEffect(() => {
+    const api = window.electronAPI;
+    if (!api) {
+      console.warn("electronAPI no disponible; ejecutando en entorno web puro");
+      setStats({ cpu: 0, ram: 0, disk: 0, status: 'good' });
+      setAppVersion('dev');
+      return;
+    }
+
     const fetchStats = async () => {
-      const s = await window.electronAPI.getSystemStats();
+      const s = await api.getSystemStats();
       setStats(s);
     };
 
     fetchStats();
-    window.electronAPI.getAppVersion()
+    api.getAppVersion()
       .then((version) => setAppVersion(version))
       .catch((e) => console.error('Error obteniendo versión de la app', e));
 
@@ -87,6 +95,10 @@ function App() {
   }, []);
 
   const toggleReports = async () => {
+    if (!window.electronAPI) {
+      setShowReports(!showReports);
+      return;
+    }
     if (!showReports) {
         try {
             const history = await window.electronAPI.getReports();
@@ -99,6 +111,10 @@ function App() {
   };
 
   const handleAnalyze = async () => {
+    if (!window.electronAPI) {
+      console.warn("Acción de análisis no disponible fuera de Electron");
+      return;
+    }
     console.log("CleanMateAI | Iniciando análisis del sistema");
     setPhase('analyzing');
     
@@ -121,6 +137,10 @@ function App() {
   };
 
   const handleStartOptimization = async () => {
+    if (!window.electronAPI) {
+      console.warn("Acción de limpieza no disponible fuera de Electron");
+      return;
+    }
     console.log("CleanMateAI | Iniciando limpieza");
     setPhase('cleaning');
     
@@ -166,6 +186,7 @@ function App() {
   };
 
   const handleChatActionStart = (action) => {
+      if (!window.electronAPI) return;
       if (action.type === 'analyze') {
           setPhase('analyzing');
       } else if (action.type === 'clean') {
@@ -178,6 +199,7 @@ function App() {
   };
 
   const handleChatActionComplete = (action, result) => {
+      if (!window.electronAPI) return;
       if (action.type === 'analyze') {
           setAnalysis(result);
           setPhase('confirmation');
