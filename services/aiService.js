@@ -78,14 +78,18 @@ async function processUserMessage(message, mode = 'analysis') {
         context.reports = [];
     }
 
+    const metrics = context && context.systemMetrics
+        ? context.systemMetrics
+        : { cpuLoad: 0, ramUsed: 0 };
+
     // 2. Save User Message
     const userEntry = {
         timestamp: new Date().toISOString(),
         role: 'user',
         message: message,
         contextSnapshot: { // Save minimal context for reference
-            cpu: context.systemMetrics.cpuLoad,
-            ram: context.systemMetrics.ramUsed
+            cpu: metrics.cpuLoad,
+            ram: metrics.ramUsed
         }
     };
     await saveChatEntry(userEntry);
