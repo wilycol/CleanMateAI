@@ -3,7 +3,7 @@ const path = require('path');
 const log = require('electron-log');
 const { getSystemStats } = require('../services/monitor');
 const { cleanSystem, analyzeSystem: scanJunk } = require('../services/cleaner');
-const { analyzeSystem: askAI } = require('../services/apiClient');
+const { analyzeSystem: askAI, checkAIConnectivity } = require('../services/apiClient');
 const { saveReport, getReports } = require('../services/reportManager');
 const { processUserMessage, getChatHistory, clearChatHistory } = require('../services/aiService');
 const { updateLastAnalysis, updateLastCleanup } = require('../services/systemContextBuilder');
@@ -161,6 +161,16 @@ app.whenReady().then(() => {
 
     ipcMain.handle('get-reports', async () => {
         return await getReports();
+    });
+
+    ipcMain.handle('get-ai-status', async () => {
+        try {
+            const status = await checkAIConnectivity();
+            return status;
+        } catch (e) {
+            log.error('AI status check failed:', e);
+            return { backend: false, analyze: false, chat: false, lastChecked: new Date().toISOString() };
+        }
     });
 
     ipcMain.handle('analyze-system', async () => {

@@ -68,6 +68,7 @@ function App() {
   const [aiResponse, setAiResponse] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [appVersion, setAppVersion] = useState('');
+  const [aiStatus, setAiStatus] = useState({ backend: null, analyze: null, chat: null, lastChecked: null });
 
   console.log("🔥 RENDERER ACTIVO - App.jsx cargado correctamente");
 
@@ -77,7 +78,7 @@ function App() {
       console.warn("electronAPI no disponible; ejecutando en entorno web puro");
       setStats({ cpu: 0, ram: 0, disk: 0, status: 'good' });
       setAppVersion('dev');
-      return;
+      return () => {};
     }
 
     const fetchStats = async () => {
@@ -92,6 +93,25 @@ function App() {
 
     const interval = setInterval(fetchStats, 5000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const api = window.electronAPI;
+    if (!api) return;
+    let canceled = false;
+
+    const fetchAIStatus = async () => {
+      try {
+        const status = await api.getAIStatus();
+        if (!canceled) setAiStatus(status);
+      } catch (e) {
+        if (!canceled) setAiStatus({ backend: false, analyze: false, chat: false, lastChecked: new Date().toISOString() });
+      }
+    };
+
+    fetchAIStatus();
+    const interval = setInterval(fetchAIStatus, 30000);
+    return () => { canceled = true; clearInterval(interval); };
   }, []);
 
   const toggleReports = async () => {
@@ -278,7 +298,16 @@ function App() {
         <div style={{ fontSize: '11px', color: '#888', WebkitAppRegion: 'no-drag' }}>
           CleanMate AI {appVersion ? `v${appVersion}` : ''}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Indicadores de conectividad */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', WebkitAppRegion: 'no-drag' }}>
+            <div title={`Backend: ${aiStatus.backend === null ? 'N/D' : aiStatus.backend ? 'Conectado' : 'Desconectado'}`}
+                 style={{ width: 10, height: 10, borderRadius: '50%', background: aiStatus.backend === null ? '#555' : aiStatus.backend ? '#00C851' : '#ff4444' }} />
+            <span style={{ fontSize: 11, color: '#888' }}>API</span>
+            <div title={`IA Chat: ${aiStatus.chat === null ? 'N/D' : aiStatus.chat ? 'Conectado' : 'Desconectado'}`}
+                 style={{ width: 10, height: 10, borderRadius: '50%', background: aiStatus.chat === null ? '#555' : aiStatus.chat ? '#00C851' : '#ff4444' }} />
+            <span style={{ fontSize: 11, color: '#888' }}>IA</span>
+          </div>
           <button onClick={toggleReports} style={{ background: 'none', border: 'none', color: showReports ? '#00C851' : '#888', cursor: 'pointer', WebkitAppRegion: 'no-drag', fontSize: '16px', marginRight: '10px' }} title="Historial de Reportes">
               🕒
           </button>

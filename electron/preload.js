@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     chatClearHistory: () => ipcRenderer.invoke('chat-clear-history'),
     chatExecuteAction: (action) => ipcRenderer.invoke('chat-execute-action', action),
     chatGetGreeting: (mode) => ipcRenderer.invoke('chat-get-greeting', mode),
+    getAIStatus: () => ipcRenderer.invoke('get-ai-status'),
     
     minimize: () => ipcRenderer.send('window-minimize'),
     close: () => ipcRenderer.send('window-close') // Hides to tray
