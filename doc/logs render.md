@@ -1,50 +1,115 @@
-2026-02-16T21:09:52.129313418Z ==> Running 'gunicorn backend.server:app'
-2026-02-16T21:09:55.434430954Z [2026-02-16 21:09:55 +0000] [38] [INFO] Starting gunicorn 25.1.0
-2026-02-16T21:09:55.434756411Z [2026-02-16 21:09:55 +0000] [38] [INFO] Listening at: http://0.0.0.0:10000 (38)
-2026-02-16T21:09:55.434786962Z [2026-02-16 21:09:55 +0000] [38] [INFO] Using worker: sync
-2026-02-16T21:09:55.556290794Z [2026-02-16 21:09:55 +0000] [38] [INFO] Control socket listening at /opt/render/project/src/gunicorn.ctl
-2026-02-16T21:10:12.502621976Z ==> Deploying...
-2026-02-16T21:10:12.665031195Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
-2026-02-16T21:11:39.355265399Z ==> Your service is live 🎉
-2026-02-16T21:11:39.796098611Z ==> 
-2026-02-16T21:11:39.798154935Z ==> ///////////////////////////////////////////////////////////
-2026-02-16T21:11:39.80994608Z ==> 
-2026-02-16T21:11:39.812027285Z ==> Available at your primary URL https://cleanmateai-backend.onrender.com
-2026-02-16T21:11:39.813814355Z ==> 
-2026-02-16T21:11:39.815872169Z ==> ///////////////////////////////////////////////////////////
-2026-02-16T21:12:36.673255449Z [2026-02-16 21:12:36 +0000] [38] [INFO] Handling signal: term
-2026-02-16T21:15:01.143051278Z 127.0.0.1 - - [16/Feb/2026:21:15:01 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:15:01.918671162Z 127.0.0.1 - - [16/Feb/2026:21:15:01 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:15:30.838123241Z 127.0.0.1 - - [16/Feb/2026:21:15:30 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:15:31.837621647Z 127.0.0.1 - - [16/Feb/2026:21:15:31 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:16:01.115143101Z 127.0.0.1 - - [16/Feb/2026:21:16:01 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:16:01.929168609Z 127.0.0.1 - - [16/Feb/2026:21:16:01 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:16:31.115095237Z 127.0.0.1 - - [16/Feb/2026:21:16:31 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:16:32.034792286Z 127.0.0.1 - - [16/Feb/2026:21:16:32 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:16:43.12996043Z ==> Detected service running on port 10000
-2026-02-16T21:16:43.232135827Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
-2026-02-16T21:17:01.016129645Z 127.0.0.1 - - [16/Feb/2026:21:17:01 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:17:02.032040023Z 127.0.0.1 - - [16/Feb/2026:21:17:02 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:17:31.653757265Z 127.0.0.1 - - [16/Feb/2026:21:17:31 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:17:32.903471002Z 127.0.0.1 - - [16/Feb/2026:21:17:32 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:18:00.829291501Z 127.0.0.1 - - [16/Feb/2026:21:18:00 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:18:01.743457035Z 127.0.0.1 - - [16/Feb/2026:21:18:01 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:18:31.125316426Z 127.0.0.1 - - [16/Feb/2026:21:18:31 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:18:31.923389002Z 127.0.0.1 - - [16/Feb/2026:21:18:31 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:19:00.908883936Z 127.0.0.1 - - [16/Feb/2026:21:19:00 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:19:01.743944154Z 127.0.0.1 - - [16/Feb/2026:21:19:01 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:19:31.072245343Z 127.0.0.1 - - [16/Feb/2026:21:19:31 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:19:31.891263251Z 127.0.0.1 - - [16/Feb/2026:21:19:31 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:19:43.624817037Z 127.0.0.1 - - [16/Feb/2026:21:19:43 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:20:01.19974769Z 127.0.0.1 - - [16/Feb/2026:21:20:01 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:20:02.034674425Z 127.0.0.1 - - [16/Feb/2026:21:20:02 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:20:31.026209157Z 127.0.0.1 - - [16/Feb/2026:21:20:31 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:20:31.739708995Z 127.0.0.1 - - [16/Feb/2026:21:20:31 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:21:00.933389378Z 127.0.0.1 - - [16/Feb/2026:21:21:00 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:21:01.619696108Z 127.0.0.1 - - [16/Feb/2026:21:21:01 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:21:31.110037527Z 127.0.0.1 - - [16/Feb/2026:21:21:31 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:21:32.113728476Z 127.0.0.1 - - [16/Feb/2026:21:21:32 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:22:00.928915699Z 127.0.0.1 - - [16/Feb/2026:21:22:00 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:22:01.702635925Z 127.0.0.1 - - [16/Feb/2026:21:22:01 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:22:30.917694528Z 127.0.0.1 - - [16/Feb/2026:21:22:30 +0000] "POST /api/chat HTTP/1.1" 502 446 "-" "axios/1.13.5"
-2026-02-16T21:22:31.737033727Z 127.0.0.1 - - [16/Feb/2026:21:22:31 +0000] "POST /api/analyze HTTP/1.1" 502 446 "-" "axios/1.13.5"
+
+Search
+
+Last hour
+
+
+
+
+New logs in Live Tail
+
+[2026-02-17 03:23:42 +0000] [57] [INFO] Handling signal: term
+[2026-02-17 03:23:42 +0000] [59] [INFO] Worker exiting (pid: 59)
+[2026-02-17 03:23:43 +0000] [57] [INFO] Shutting down: Master
+==> Detected service running on port 10000
+==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+[2026-02-17 03:38:24 +0000] [57] [INFO] Handling signal: term
+[2026-02-17 03:38:24 +0000] [59] [INFO] Worker exiting (pid: 59)
+[2026-02-17 03:38:25 +0000] [57] [INFO] Shutting down: Master
+[2026-02-17 03:43:04 +0000] [40] [INFO] Booting worker with pid: 40
+127.0.0.1 - - [17/Feb/2026:03:43:11 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:43:11 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:44:45 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:44:47 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:45:43 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:45:44 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:46:43 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:46:44 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:47:46 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:47:47 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:48:45 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:48:46 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:51:11 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:51:12 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:57:43 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:57:44 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:58:45 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:58:49 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:59:44 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:03:59:45 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:00:44 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:00:44 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:01:43 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:01:43 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:02:48 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:02:49 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:03:49 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:03:49 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:05:09 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:05:10 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:05:45 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:05:46 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:06:45 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:06:45 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:07:43 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:07:44 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:08:45 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:08:45 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:09:45 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:09:46 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:10:46 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:10:49 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+==> Deploying...
+==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+127.0.0.1 - - [17/Feb/2026:04:11:46 +0000] "POST /api/chat HTTP/1.1" 502 85 "-" "axios/1.13.5"
+127.0.0.1 - - [17/Feb/2026:04:11:47 +0000] "POST /api/analyze HTTP/1.1" 502 85 "-" "axios/1.13.5"
+==> Running 'gunicorn backend.server:app'
+[2026-02-17 04:12:19 +0000] [57] [INFO] Starting gunicorn 25.1.0
+[2026-02-17 04:12:19 +0000] [57] [INFO] Listening at: http://0.0.0.0:10000 (57)
+[2026-02-17 04:12:19 +0000] [57] [INFO] Using worker: sync
+[2026-02-17 04:12:19 +0000] [57] [INFO] Control socket listening at /opt/render/project/src/gunicorn.ctl
+==> 
+==> Available at your primary URL https://cleanmateai-backend.onrender.com
+==> 
+==> ///////////////////////////////////////////////////////////
+==> No open HTTP ports detected on 0.0.0.0, continuing to scan...
+[2026-02-17 04:13:21 +0000] [38] [INFO] Handling signal: term
+[2026-02-17 04:13:21 +0000] [40] [INFO] Worker exiting (pid: 40)
+[2026-02-17 04:13:21 +0000] [38] [INFO] Shutting down: Master
+==> No open HTTP ports detected on 0.0.0.0, continuing to scan...
+==> No open HTTP ports detected on 0.0.0.0, continuing to scan...
+==> No open HTTP ports detected on 0.0.0.0, continuing to scan...
+==> No open HTTP ports detected on 0.0.0.0, continuing to scan...
+==> Deploying...
+==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+==> Running 'gunicorn backend.server:app'
+==> Your service is live 🎉
+==> 
+==> ///////////////////////////////////////////////////////////
+==> 
+==> Available at your primary URL https://cleanmateai-backend.onrender.com
+==> 
+==> ///////////////////////////////////////////////////////////
+[2026-02-17 04:18:14 +0000] [56] [INFO] Starting gunicorn 25.1.0
+[2026-02-17 04:18:14 +0000] [56] [INFO] Listening at: http://0.0.0.0:10000 (56)
+[2026-02-17 04:18:14 +0000] [56] [INFO] Using worker: sync
+[2026-02-17 04:18:14 +0000] [56] [INFO] Control socket listening at /opt/render/project/src/gunicorn.ctl
+[2026-02-17 04:18:14 +0000] [58] [INFO] Booting worker with pid: 58
+127.0.0.1 - - [17/Feb/2026:04:18:14 +0000] "HEAD / HTTP/1.1" 200 0 "-" "Go-http-client/1.1"
+127.0.0.1 - - [17/Feb/2026:04:18:46 +0000] "GET /api/ai-health HTTP/1.1" 200 106 "-" "axios/1.13.5"
+==> New primary port detected: 10000. Restarting deploy to update network configuration...
+==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+[2026-02-17 04:19:09 +0000] [57] [INFO] Handling signal: term
+127.0.0.1 - - [17/Feb/2026:04:19:12 +0000] "GET /api/ai-health HTTP/1.1" 200 106 "-" "axios/1.13.5"
+==> Running 'gunicorn backend.server:app'
+[2026-02-17 04:19:24 +0000] [56] [INFO] Starting gunicorn 25.1.0
+[2026-02-17 04:19:24 +0000] [56] [INFO] Listening at: http://0.0.0.0:10000 (56)
+[2026-02-17 04:19:24 +0000] [56] [INFO] Using worker: sync
+[2026-02-17 04:19:24 +0000] [56] [INFO] Control socket listening at /opt/render/project/src/gunicorn.ctl
+==> No open HTTP ports detected on 0.0.0.0, continuing to scan...
+[2026-02-17 04:20:28 +0000] [56] [INFO] Handling signal: term
+[2026-02-17 04:20:28 +0000] [58] [INFO] Worker exiting (pid: 58)
+[2026-02-17 04:20:28 +0000] [56] [INFO] Shutting down: Master
+==> No open HTTP ports detected on 0.0.0.0, continuing to scan...
+==> No open HTTP ports detected on 0.0.0.0, continuing to scan...
+==> No open HTTP ports detected on 0.0.0.0, continuing to scan...

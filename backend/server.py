@@ -14,6 +14,7 @@ OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openrouter/aurora-alpha")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 AGENT_PROMPT = """
+You are the AI assistant of CleanMate.
 Eres CleanMate AI, un asistente experto en rendimiento y optimización de sistemas Windows. 
 
 No eres un bot genérico. 
@@ -41,6 +42,35 @@ Reglas de comportamiento:
 7. Si el sistema está bien, dilo. Si hay riesgo, explícalo sin generar miedo.
 8. Tienes libertad para razonar y explicar causas probables.
 9. Termina siempre con una sugerencia clara de acción.
+You receive structured system data including:
+- Current system metrics (CPU, RAM, Disk usage).
+- The latest saved system analysis report (if available).
+- The latest saved optimization report (if available).
+
+Your responsibilities:
+
+1. If metrics are provided, you MUST reference them explicitly in your response.
+   - Mention actual values (e.g., CPU 42%, RAM 68%).
+   - Do not ignore them.
+   - Do not say there is no data if values are present.
+
+2. If a previous analysis report exists, you MUST consider it in your reasoning.
+
+3. If a previous optimization report exists, you MUST consider its results before recommending further actions.
+
+4. Your diagnosis must always be based on the provided context.
+   Never invent missing data.
+   Never assume absence of data if structured information is present.
+
+5. When appropriate, suggest clear actions such as:
+   - Run system analysis
+   - Execute system optimization
+   - Review current system state
+
+Be precise, analytical, and system-focused.
+Do not roleplay.
+Do not add emotional language.
+Focus strictly on system diagnostics and actionable guidance.
 """
 
 def _call_openrouter(messages, max_tokens=400, temperature=0.3, timeout=10):
@@ -145,37 +175,48 @@ def chat():
         last_cleanup = context.get("lastCleanup")
         mode = context.get("mode", "analysis")
 
-        context_text = f"""
-Modo actual: {mode}
+        cpu = system_metrics.get("cpuLoad", "N/A")
+        ram = system_metrics.get("ramUsed", "N/A")
+        disk = system_metrics.get("diskUsed", "N/A")
+        disk_free = system_metrics.get("diskFreeGB", "N/A")
 
-Métricas del sistema:
-- CPU: {system_metrics.get('cpuLoad', 'N/A')}%
-- RAM: {system_metrics.get('ramUsed', 'N/A')}%
-- Disco usado: {system_metrics.get('diskUsed', 'N/A')}%
-- Espacio libre en disco (GB): {system_metrics.get('diskFreeGB', 'N/A')}
-"""
+        analysis_summary = "None"
         if last_analysis:
-            context_text += f"""
-Último análisis:
-- Espacio recuperable estimado (MB): {last_analysis.get('recoverableMB', 'N/A')}
-- Archivos detectados: {last_analysis.get('fileCount', 'N/A')}
-- Archivos solo lectura: {last_analysis.get('readOnlyCount', 'N/A')}
-"""
+            analysis_summary = (
+                f"RecoverableMB: {last_analysis.get('recoverableMB', 'N/A')}, "
+                f"FileCount: {last_analysis.get('fileCount', 'N/A')}, "
+                f"ReadOnlyCount: {last_analysis.get('readOnlyCount', 'N/A')}"
+            )
+
+        optimization_summary = "None"
         if last_cleanup:
-            context_text += f"""
-Última limpieza:
-- Espacio liberado (MB): {last_cleanup.get('freedMB', 'N/A')}
-- Archivos eliminados: {last_cleanup.get('filesDeleted', 'N/A')}
+            optimization_summary = (
+                f"FreedMB: {last_cleanup.get('freedMB', 'N/A')}, "
+                f"FilesDeleted: {last_cleanup.get('filesDeleted', 'N/A')}"
+            )
+
+        context_text = f"""
+MODE:
+{mode}
+
+CURRENT METRICS:
+CPU: {cpu}%
+RAM: {ram}%
+Disk: {disk}%
+DiskFreeGB: {disk_free}
+
+LAST ANALYSIS REPORT:
+{analysis_summary}
+
+LAST OPTIMIZATION REPORT:
+{optimization_summary}
 """
 
         full_prompt = f"""
-Mensaje del usuario:
-{user_message}
-
-Contexto técnico actual:
 {context_text}
 
-Responde siguiendo estrictamente el rol y reglas del agente CleanMate AI.
+USER MESSAGE:
+{user_message}
 """
 
         messages = [
