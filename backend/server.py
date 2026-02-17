@@ -13,7 +13,7 @@ GROK_API_KEY = os.getenv("GROK_API_KEY")
 GROK_API_URL = "https://api.x.ai/v1/chat/completions"
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
 GEMINI_OPENAI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 
 AGENT_PROMPT = """
@@ -49,7 +49,7 @@ Reglas de comportamiento:
 def _call_gemini_openai(messages, max_tokens=500, timeout=10):
     if not GEMINI_API_KEY:
         raise RuntimeError("GEMINI_API_KEY no configurada")
-    app.logger.info(f"Gemini request model={GEMINI_MODEL}")
+    app.logger.info(f"Gemini request endpoint={GEMINI_OPENAI_URL} model={GEMINI_MODEL}")
     payload = {
         "model": GEMINI_MODEL,
         "messages": messages,
@@ -60,8 +60,11 @@ def _call_gemini_openai(messages, max_tokens=500, timeout=10):
         "Content-Type": "application/json"
     }
     resp = requests.post(GEMINI_OPENAI_URL, json=payload, headers=headers, timeout=timeout)
+    app.logger.info(f"Gemini response status={resp.status_code}")
     if resp.status_code == 200:
         return resp.json()
+    if resp.status_code == 429:
+        raise RuntimeError("Gemini quota exceeded (429)")
     raise RuntimeError(resp.text)
 
 def _call_grok(messages, max_tokens=500, timeout=10):
@@ -209,17 +212,10 @@ Responde siguiendo estrictamente el rol y reglas del agente CleanMate AI.
         gemini_err = None
         if GEMINI_API_KEY:
             try:
-                data = _call_gemini_openai(messages, max_tokens=500)
+                data = _call_gemini_openai(messages, max_tokens=300)
                 return jsonify(data)
             except Exception as e:
                 gemini_err = str(e)
-
-        if GROK_API_KEY:
-            try:
-                data = _call_grok(messages, max_tokens=500)
-                return jsonify(data)
-            except Exception as e:
-                return jsonify({"error": "Error al consultar IA", "details": {"gemini": gemini_err, "grok": str(e)}}), 502
 
         if gemini_err:
             return jsonify({"error": "Error al consultar IA", "details": {"gemini": gemini_err}}), 502
@@ -231,32 +227,12 @@ Responde siguiendo estrictamente el rol y reglas del agente CleanMate AI.
 
 @app.route('/api/ai-health', methods=['GET'])
 def ai_health():
-    result = {"gemini": {"ok": False, "error": None}, "grok": {"ok": False, "error": None}}
-    try:
-        if GEMINI_API_KEY:
-            try:
-                _ = _call_gemini_openai([{"role": "user", "content": "__health_check__"}], max_tokens=5, timeout=6)
-                result["gemini"]["ok"] = True
-            except Exception as e:
-                result["gemini"]["error"] = str(e)
-        else:
-            result["gemini"]["error"] = "GEMINI_API_KEY no configurada"
-    except Exception as e:
-        result["gemini"]["error"] = str(e)
-
-    try:
-        if GROK_API_KEY:
-            try:
-                _ = _call_grok([{"role": "user", "content": "__health_check__"}], max_tokens=5, timeout=6)
-                result["grok"]["ok"] = True
-            except Exception as e:
-                result["grok"]["error"] = str(e)
-        else:
-            result["grok"]["error"] = "GROK_API_KEY no configurada"
-    except Exception as e:
-        result["grok"]["error"] = str(e)
-
-    return jsonify(result)
+    return jsonify({
+        "status": "ok",
+        "gemini_configured": bool(GEMINI_API_KEY),
+        "gemini_model": GEMINI_MODEL,
+        "grok_configured": False
+    })
 
 @app.route('/', methods=['GET'])
 def health_check():
