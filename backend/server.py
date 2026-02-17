@@ -109,7 +109,7 @@ def analyze_system():
                 return jsonify(data)
             except Exception as e:
                 app.logger.error("Error en IA de análisis", exc_info=True)
-                return jsonify({"error": "Error al consultar IA de análisis"}), 502
+                return jsonify({"error": "Error al consultar IA de análisis", "details": str(e)}), 502
 
         return jsonify({"error": "Servidor sin clave de IA configurada"}), 500
 
@@ -189,7 +189,7 @@ Responde siguiendo estrictamente el rol y reglas del agente CleanMate AI.
                 return jsonify(data)
             except Exception as e:
                 app.logger.error("Error en IA de chat", exc_info=True)
-                return jsonify({"error": "Error al consultar IA de chat"}), 502
+                return jsonify({"error": "Error al consultar IA de chat", "details": str(e)}), 502
 
         return jsonify({"error": "Servidor sin clave de IA configurada"}), 500
 
