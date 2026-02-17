@@ -198,11 +198,16 @@ async function generateAIResponse(userMsg, context) {
     const isStrongClean = isClean && hasExecuteVerb;
 
     // --- 2. Persona & Context Variables ---
-    const metrics = context && context.systemMetrics ? context.systemMetrics : { cpuLoad: 0, ramUsed: 0, diskUsed: 0 };
+    const metrics = context && context.systemMetrics
+        ? context.systemMetrics
+        : { cpuLoad: 0, ramUsed: 0, diskUsed: 0 };
     const { cpuLoad, ramUsed, diskUsed } = metrics;
     const cpuHigh = cpuLoad > 80;
     const ramHigh = ramUsed > 80;
     const diskFull = diskUsed > 90;
+
+    const lastAnalysis = context && context.lastAnalysis ? context.lastAnalysis : null;
+    const reports = context && Array.isArray(context.reports) ? context.reports : [];
     
     // Natural conversation starters
     const openers = [
@@ -217,7 +222,7 @@ async function generateAIResponse(userMsg, context) {
     // --- 3. Logic Engine ---
     // 3.1 Intentos fuertes: el usuario pide ejecutar directamente
     if (isStrongClean) {
-        if (context.lastAnalysis && context.lastAnalysis.recoverableMB > 0) {
+        if (lastAnalysis && lastAnalysis.recoverableMB > 0) {
             response = `Perfecto, voy a ejecutar la optimización ahora mismo sobre lo que ya analizamos. 🧹\n\nSi notas algo raro, siempre puedes volver a escribirme.`;
             actionSuggestion = {
                 type: 'clean',
@@ -268,8 +273,8 @@ async function generateAIResponse(userMsg, context) {
         };
 
     } else if (isClean) {
-        if (context.lastAnalysis && context.lastAnalysis.recoverableMB > 0) {
-            response = `¡Manos a la obra! 🧹\n\nSegún lo que vi, podemos recuperar unos **${context.lastAnalysis.recoverableMB} MB**. Eso le dará un respiro a tu disco. ¿Procedemos con la limpieza?`;
+        if (lastAnalysis && lastAnalysis.recoverableMB > 0) {
+            response = `¡Manos a la obra! 🧹\n\nSegún lo que vi, podemos recuperar unos **${lastAnalysis.recoverableMB} MB**. Eso le dará un respiro a tu disco. ¿Procedemos con la limpieza?`;
             actionSuggestion = {
                 type: 'clean',
                 targets: ['temp', 'cache_chrome', 'cache_edge'],
@@ -294,8 +299,8 @@ async function generateAIResponse(userMsg, context) {
         }
 
     } else if (isHistory) {
-        if (context.reports && context.reports.length > 0) {
-            const last = context.reports[0];
+        if (reports && reports.length > 0) {
+            const last = reports[0];
             if (last.type === 'cleanup' && last.stats) {
                 response = `Haciendo memoria... 🤔\n\nLa última vez (el ${new Date(last.timestamp).toLocaleDateString()}) eliminamos **${last.stats.filesDeleted} archivos** y recuperamos **${last.stats.freedMB} MB**. ¡Fue un buen trabajo!`;
             } else {
