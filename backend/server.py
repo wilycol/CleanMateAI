@@ -7,14 +7,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Permitir peticiones desde cualquier origen (ajustar en producción)
+CORS(app)
 
-GROK_API_KEY = os.getenv("GROK_API_KEY")
-GROK_API_URL = "https://api.x.ai/v1/chat/completions"
-
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
-GEMINI_OPENAI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openrouter/aurora-alpha")
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 AGENT_PROMPT = """
 Eres CleanMate AI, un asistente experto en rendimiento y optimización de sistemas Windows. 
@@ -46,44 +43,31 @@ Reglas de comportamiento:
 9. Termina siempre con una sugerencia clara de acción.
 """
 
-def _call_gemini_openai(messages, max_tokens=500, timeout=10):
-    if not GEMINI_API_KEY:
-        raise RuntimeError("GEMINI_API_KEY no configurada")
-    app.logger.info(f"Gemini request endpoint={GEMINI_OPENAI_URL} model={GEMINI_MODEL}")
+def _call_openrouter(messages, max_tokens=400, temperature=0.3, timeout=10):
+    if not OPENROUTER_API_KEY:
+        raise RuntimeError("OPENROUTER_API_KEY no configurada")
+    app.logger.info(f"OpenRouter request endpoint={OPENROUTER_URL} model={OPENROUTER_MODEL}")
     payload = {
-        "model": GEMINI_MODEL,
+        "model": OPENROUTER_MODEL,
         "messages": messages,
+        "temperature": temperature,
         "max_tokens": max_tokens
     }
     headers = {
-        "Authorization": f"Bearer {GEMINI_API_KEY}",
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json"
     }
-    resp = requests.post(GEMINI_OPENAI_URL, json=payload, headers=headers, timeout=timeout)
-    app.logger.info(f"Gemini response status={resp.status_code}")
+    resp = requests.post(OPENROUTER_URL, json=payload, headers=headers, timeout=timeout)
+    app.logger.info(f"OpenRouter response status={resp.status_code}")
     if resp.status_code == 200:
-        return resp.json()
+        data = resp.json()
+        return data
     if resp.status_code == 429:
-        raise RuntimeError("Gemini quota exceeded (429)")
-    raise RuntimeError(resp.text)
-
-def _call_grok(messages, max_tokens=500, timeout=10):
-    if not GROK_API_KEY:
-        raise RuntimeError("GROK_API_KEY no configurada")
-    grok_model = os.getenv("GROK_MODEL", "grok-3-mini")
-    app.logger.info(f"Grok request model={grok_model}")
-    payload = {
-        "model": grok_model,
-        "messages": messages,
-        "max_tokens": max_tokens
-    }
-    headers = {
-        "Authorization": f"Bearer {GROK_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    resp = requests.post(GROK_API_URL, json=payload, headers=headers, timeout=timeout)
-    if resp.status_code == 200:
-        return resp.json()
+        raise RuntimeError("OpenRouter rate limit (429)")
+    if resp.status_code == 401:
+        raise RuntimeError("OpenRouter unauthorized (401)")
+    if 500 <= resp.status_code < 600:
+        raise RuntimeError(f"OpenRouter server error ({resp.status_code})")
     raise RuntimeError(resp.text)
 
 @app.route('/api/analyze', methods=['POST'])
@@ -119,25 +103,15 @@ def analyze_system():
             }
         ]
 
-        gemini_err = None
-        if GEMINI_API_KEY:
+        if OPENROUTER_API_KEY:
             try:
-                data = _call_gemini_openai(messages, max_tokens=300)
+                data = _call_openrouter(messages, max_tokens=300)
                 return jsonify(data)
             except Exception as e:
-                gemini_err = str(e)
+                app.logger.error("Error en IA de análisis", exc_info=True)
+                return jsonify({"error": "Error al consultar IA de análisis"}), 502
 
-        if GROK_API_KEY:
-            try:
-                data = _call_grok(messages, max_tokens=300)
-                return jsonify(data)
-            except Exception as e:
-                return jsonify({"error": "Error al consultar IA", "details": {"gemini": gemini_err, "grok": str(e)}}), 502
-
-        if gemini_err:
-            return jsonify({"error": "Error al consultar IA", "details": {"gemini": gemini_err}}), 502
-
-        return jsonify({"error": "Servidor sin claves de IA configuradas"}), 500
+        return jsonify({"error": "Servidor sin clave de IA configurada"}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -209,18 +183,15 @@ Responde siguiendo estrictamente el rol y reglas del agente CleanMate AI.
             {"role": "user", "content": full_prompt}
         ]
 
-        gemini_err = None
-        if GEMINI_API_KEY:
+        if OPENROUTER_API_KEY:
             try:
-                data = _call_gemini_openai(messages, max_tokens=300)
+                data = _call_openrouter(messages, max_tokens=300)
                 return jsonify(data)
             except Exception as e:
-                gemini_err = str(e)
+                app.logger.error("Error en IA de chat", exc_info=True)
+                return jsonify({"error": "Error al consultar IA de chat"}), 502
 
-        if gemini_err:
-            return jsonify({"error": "Error al consultar IA", "details": {"gemini": gemini_err}}), 502
-
-        return jsonify({"error": "Servidor sin claves de IA configuradas"}), 500
+        return jsonify({"error": "Servidor sin clave de IA configurada"}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -229,8 +200,8 @@ Responde siguiendo estrictamente el rol y reglas del agente CleanMate AI.
 def ai_health():
     return jsonify({
         "status": "ok",
-        "gemini_configured": bool(GEMINI_API_KEY),
-        "gemini_model": GEMINI_MODEL,
+        "gemini_configured": bool(OPENROUTER_API_KEY),
+        "gemini_model": OPENROUTER_MODEL,
         "grok_configured": False
     })
 
