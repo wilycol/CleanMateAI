@@ -76,8 +76,6 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
 
              if (result.success) {
                 setMessages(prev => [...prev, { role: 'assistant', message: `✅ Acción "${action.label}" completada con éxito.` }]);
-                
-                // Auto-resumen conciso posterior a la acción
                 try {
                     if (action.type === 'analyze') {
                         await handleSendMessage(

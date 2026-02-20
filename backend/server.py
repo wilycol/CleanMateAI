@@ -175,6 +175,30 @@ def chat():
                 f"FilesDeleted: {last_cleanup.get('filesDeleted', 'N/A')}"
             )
 
+        # Include detailed last reports (if provided by frontend context)
+        reports = context.get("reports", []) or []
+        latest_analysis = next((r for r in reports if r.get('type') == 'analysis'), None)
+        latest_cleanup = next((r for r in reports if r.get('type') == 'cleanup'), None)
+
+        analysis_details = "None"
+        if latest_analysis:
+            stats = latest_analysis.get('stats', {}) or {}
+            ai_msg = (latest_analysis.get('ai', {}) or {}).get('message')
+            ai_excerpt = (ai_msg or "")[:280] if ai_msg else "N/A"
+            analysis_details = (
+                f"spaceRecoverableMB={stats.get('spaceRecoverableMB', 'N/A')}, "
+                f"fileCount={stats.get('fileCount', 'N/A')}, "
+                f"aiExcerpt={ai_excerpt}"
+            )
+
+        cleanup_details = "None"
+        if latest_cleanup:
+            stats = latest_cleanup.get('stats', {}) or latest_cleanup  # some callers may store directly
+            cleanup_details = (
+                f"freedMB={stats.get('freedMB', 'N/A')}, "
+                f"filesDeleted={stats.get('filesDeleted', 'N/A')}"
+            )
+
         context_text = f"""
 MODE:
 {mode}
@@ -190,6 +214,12 @@ LAST ANALYSIS REPORT:
 
 LAST OPTIMIZATION REPORT:
 {optimization_summary}
+
+ ANALYSIS HISTORY (latest):
+ {analysis_details}
+
+ OPTIMIZATION HISTORY (latest):
+ {cleanup_details}
 """
 
         full_prompt = f"""

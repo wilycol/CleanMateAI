@@ -364,6 +364,23 @@ app.whenReady().then(() => {
             };
 
             updateLastAnalysis(finalResult);
+            // Save analysis report so UI context can include it immediately
+            try {
+                await saveReport({
+                    type: 'analysis',
+                    stats: {
+                        spaceRecoverableMB: finalResult.spaceRecoverableMB,
+                        fileCount: finalResult.fileCount
+                    },
+                    ai: {
+                        message: finalResult.choices && finalResult.choices[0] && finalResult.choices[0].message
+                            ? finalResult.choices[0].message.content
+                            : null
+                    }
+                });
+            } catch (e) {
+                log.error('Failed to save analysis report (chat action):', e);
+            }
             return { success: true, result: finalResult };
 
         } else if (action.type === 'clean') {
@@ -374,6 +391,15 @@ app.whenReady().then(() => {
             };
             const result = await cleanSystem(onProgress);
             updateLastCleanup(result);
+            // Save cleanup report for immediate context availability
+            try {
+                await saveReport({
+                    type: 'cleanup',
+                    stats: result
+                });
+            } catch (e) {
+                log.error('Failed to save cleanup report (chat action):', e);
+            }
             return { success: true, result };
         }
         
