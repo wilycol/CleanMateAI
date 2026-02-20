@@ -9,9 +9,9 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openrouter/aurora-alpha")
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama3-8b-8192")
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 AGENT_PROMPT = """
 You are the AI assistant of CleanMate.
@@ -73,31 +73,31 @@ Do not add emotional language.
 Focus strictly on system diagnostics and actionable guidance.
 """
 
-def _call_openrouter(messages, max_tokens=400, temperature=0.3, timeout=10):
-    if not OPENROUTER_API_KEY:
-        raise RuntimeError("OPENROUTER_API_KEY no configurada")
-    app.logger.info(f"OpenRouter request endpoint={OPENROUTER_URL} model={OPENROUTER_MODEL}")
+def _call_groq(messages, max_tokens=400, temperature=0.3, timeout=10):
+    if not GROQ_API_KEY:
+        raise RuntimeError("GROQ_API_KEY no configurada")
+    app.logger.info(f"Groq request endpoint={GROQ_URL} model={GROQ_MODEL}")
     payload = {
-        "model": OPENROUTER_MODEL,
+        "model": GROQ_MODEL,
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens
     }
     headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
     }
-    resp = requests.post(OPENROUTER_URL, json=payload, headers=headers, timeout=timeout)
-    app.logger.info(f"OpenRouter response status={resp.status_code}")
+    resp = requests.post(GROQ_URL, json=payload, headers=headers, timeout=timeout)
+    app.logger.info(f"Groq response status={resp.status_code}")
     if resp.status_code == 200:
         data = resp.json()
         return data
     if resp.status_code == 429:
-        raise RuntimeError("OpenRouter rate limit (429)")
+        raise RuntimeError("Groq rate limit (429)")
     if resp.status_code == 401:
-        raise RuntimeError("OpenRouter unauthorized (401)")
+        raise RuntimeError("Groq unauthorized (401)")
     if 500 <= resp.status_code < 600:
-        raise RuntimeError(f"OpenRouter server error ({resp.status_code})")
+        raise RuntimeError(f"Groq server error ({resp.status_code})")
     raise RuntimeError(resp.text)
 
 @app.route('/api/analyze', methods=['POST'])
@@ -133,15 +133,15 @@ def analyze_system():
             }
         ]
 
-        if OPENROUTER_API_KEY:
+        if GROQ_API_KEY:
             try:
-                data = _call_openrouter(messages, max_tokens=300)
+                data = _call_groq(messages, max_tokens=300)
                 return jsonify(data)
             except Exception as e:
-                app.logger.error("Error en IA de análisis", exc_info=True)
+                app.logger.error("Error en IA de análisis (Groq)", exc_info=True)
                 return jsonify({"error": "Error al consultar IA de análisis", "details": str(e)}), 502
 
-        return jsonify({"error": "Servidor sin clave de IA configurada"}), 500
+        return jsonify({"error": "Servidor sin clave de IA configurada (Groq_API_KEY ausente)"}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -224,15 +224,15 @@ USER MESSAGE:
             {"role": "user", "content": full_prompt}
         ]
 
-        if OPENROUTER_API_KEY:
+        if GROQ_API_KEY:
             try:
-                data = _call_openrouter(messages, max_tokens=300)
+                data = _call_groq(messages, max_tokens=300)
                 return jsonify(data)
             except Exception as e:
-                app.logger.error("Error en IA de chat", exc_info=True)
+                app.logger.error("Error en IA de chat (Groq)", exc_info=True)
                 return jsonify({"error": "Error al consultar IA de chat", "details": str(e)}), 502
 
-        return jsonify({"error": "Servidor sin clave de IA configurada"}), 500
+        return jsonify({"error": "Servidor sin clave de IA configurada (Groq_API_KEY ausente)"}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -241,8 +241,8 @@ USER MESSAGE:
 def ai_health():
     return jsonify({
         "status": "ok",
-        "gemini_configured": bool(OPENROUTER_API_KEY),
-        "gemini_model": OPENROUTER_MODEL,
+        "gemini_configured": bool(GROQ_API_KEY),
+        "gemini_model": GROQ_MODEL,
         "grok_configured": False
     })
 

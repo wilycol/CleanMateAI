@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
 const path = require('path');
 const log = require('electron-log');
+const { spawn } = require('child_process');
 const { getSystemStats } = require('../services/monitor');
 const { cleanSystem, analyzeSystem: scanJunk } = require('../services/cleaner');
 const { analyzeSystem: askAI, checkAIConnectivity } = require('../services/apiClient');
@@ -170,6 +171,36 @@ app.whenReady().then(() => {
         } catch (e) {
             log.error('AI status check failed:', e);
             return { backend: false, analyze: false, chat: false, lastChecked: new Date().toISOString() };
+        }
+    });
+
+    ipcMain.handle('run-system-tool', async (event, tool) => {
+        log.info('IPC: run-system-tool', tool);
+        const safeTool = typeof tool === 'string' ? tool : '';
+        let command = null;
+        let args = [];
+
+        if (safeTool === 'diskCleanup') {
+            command = 'cleanmgr.exe';
+        } else if (safeTool === 'defragUI') {
+            command = 'dfrgui.exe';
+        } else if (safeTool === 'storageSettings') {
+            command = 'cmd.exe';
+            args = ['/c', 'start', '', 'ms-settings:storagesense'];
+        } else if (safeTool === 'openTemp') {
+            command = 'explorer.exe';
+            args = [process.env.TEMP || '%TEMP%'];
+        } else {
+            throw new Error('Unknown system tool');
+        }
+
+        try {
+            const child = spawn(command, args, { shell: false, detached: true, stdio: 'ignore' });
+            child.unref();
+            return { success: true };
+        } catch (e) {
+            log.error('Failed to launch system tool', tool, e);
+            return { success: false, error: e.message || 'Error launching tool' };
         }
     });
 

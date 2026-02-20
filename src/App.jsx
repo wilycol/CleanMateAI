@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AIChat from './AIChat';
 
-const ReportItem = ({ report }) => {
+const ReportItem = ({ report, onDownload }) => {
     const [expanded, setExpanded] = useState(false);
     const errors = report.stats?.errors || [];
     const hasErrors = errors.length > 0;
@@ -17,9 +17,27 @@ const ReportItem = ({ report }) => {
 
     return (
         <div style={{ background: '#333', padding: '10px', borderRadius: '5px', marginBottom: '10px', fontSize: '13px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                <span style={{ color: '#00C851', fontWeight: 'bold' }}>{typeLabel}</span>
-                <span style={{ color: '#888' }}>{new Date(report.timestamp).toLocaleString()}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ color: '#00C851', fontWeight: 'bold' }}>{typeLabel}</span>
+                    <span style={{ color: '#888', fontSize: '11px' }}>{new Date(report.timestamp).toLocaleString()}</span>
+                </div>
+                {onDownload && (
+                    <button
+                        onClick={() => onDownload(report)}
+                        style={{
+                            background: 'transparent',
+                            border: '1px solid #555',
+                            color: '#ccc',
+                            borderRadius: '4px',
+                            padding: '3px 6px',
+                            fontSize: '11px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Descargar
+                    </button>
+                )}
             </div>
             <div style={{ color: '#ccc' }}>
                 <div>{mainStatLabel}: {mainStatValue} MB</div>
@@ -241,13 +259,39 @@ function App() {
     return '#00C851';
   };
 
+  const runAdvancedTool = async (tool) => {
+    if (!window.electronAPI || !window.electronAPI.runSystemTool) {
+      console.warn('runSystemTool no disponible');
+      return;
+    }
+    try {
+      await window.electronAPI.runSystemTool(tool);
+    } catch (e) {
+      console.error('Error ejecutando herramienta de sistema', e);
+    }
+  };
+
   const downloadReport = () => {
     const element = document.createElement("a");
     const file = new Blob([JSON.stringify({ report, analysis, aiResponse }, null, 2)], {type: 'text/plain'});
     element.href = URL.createObjectURL(file);
     element.download = "CleanMate_Report.json";
-    document.body.appendChild(element); // Required for this to work in FireFox
+    document.body.appendChild(element);
     element.click();
+    document.body.removeChild(element);
+  };
+
+  const downloadReportFromHistory = (historyReport) => {
+    if (!historyReport) return;
+    const element = document.createElement("a");
+    const file = new Blob([JSON.stringify(historyReport, null, 2)], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    const safeDate = new Date(historyReport.timestamp).toISOString().replace(/[:.]/g, '-');
+    const nameType = historyReport.type === 'analysis' ? 'Analisis' : 'Limpieza';
+    element.download = `CleanMate_${nameType}_${safeDate}.json`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   const renderConfirmation = () => (
@@ -351,7 +395,7 @@ function App() {
                     <p style={{ color: '#888', textAlign: 'center', fontSize: '13px' }}>No hay reportes guardados.</p>
                 ) : (
                     reportsHistory.map(r => (
-                        <ReportItem key={r.id} report={r} />
+                        <ReportItem key={r.id} report={r} onDownload={downloadReportFromHistory} />
                     ))
                 )}
             </div>
@@ -438,11 +482,41 @@ function App() {
                 </button>
              </div>
           </div>
+
+          <div style={{ marginTop: '25px', width: '100%', maxWidth: '400px' }}>
+              <h3 style={{ fontSize: '14px', color: '#ccc', marginBottom: '10px', textAlign: 'left' }}>Optimizaciones avanzadas (herramientas de Windows)</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <button
+                      onClick={() => runAdvancedTool('diskCleanup')}
+                      style={{ ...buttonStyle, padding: '10px', fontSize: '12px' }}
+                  >
+                      Liberador de espacio
+                  </button>
+                  <button
+                      onClick={() => runAdvancedTool('defragUI')}
+                      style={{ ...buttonStyle, padding: '10px', fontSize: '12px' }}
+                  >
+                      Optimizar unidades
+                  </button>
+                  <button
+                      onClick={() => runAdvancedTool('storageSettings')}
+                      style={{ ...buttonStyle, padding: '10px', fontSize: '12px' }}
+                  >
+                      Configurar limpieza automática
+                  </button>
+                  <button
+                      onClick={() => runAdvancedTool('openTemp')}
+                      style={{ ...buttonStyle, padding: '10px', fontSize: '12px' }}
+                  >
+                      Abrir carpeta TEMP
+                  </button>
+              </div>
+          </div>
           
           {showReports && (
               <div className="reports-history" style={{marginTop: '20px', maxHeight: '200px', overflowY: 'auto'}}>
                   {reportsHistory.map((r, i) => (
-                      <ReportItem key={i} report={r} />
+                      <ReportItem key={i} report={r} onDownload={downloadReportFromHistory} />
                   ))}
               </div>
           )}
