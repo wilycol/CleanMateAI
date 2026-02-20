@@ -72,10 +72,27 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
              
              const result = await window.electronAPI.chatExecuteAction(action);
              
-             if (onActionComplete) onActionComplete(action, result);
+            if (onActionComplete) onActionComplete(action, result);
 
              if (result.success) {
-                 setMessages(prev => [...prev, { role: 'assistant', message: `✅ Acción "${action.label}" completada con éxito.` }]);
+                setMessages(prev => [...prev, { role: 'assistant', message: `✅ Acción "${action.label}" completada con éxito.` }]);
+                
+                // Auto-resumen conciso posterior a la acción
+                try {
+                    if (action.type === 'analyze') {
+                        await handleSendMessage(
+                            "Resume el ÚLTIMO ANÁLISIS del sistema en 4 líneas máximo: 1) síntesis del hallazgo, 2) impacto, 3) categorías relevantes, 4) si recomiendas optimizar ahora. Sé muy conciso.",
+                            true
+                        );
+                    } else if (action.type === 'clean') {
+                        await handleSendMessage(
+                            "Resume la ÚLTIMA OPTIMIZACIÓN ejecutada en 3 líneas máximo: 1) espacio liberado y archivos, 2) cambios relevantes, 3) siguiente paso recomendado. Sé muy conciso.",
+                            true
+                        );
+                    }
+                } catch (e) {
+                    console.error('Auto-resumen post-acción falló:', e);
+                }
              } else {
                  setMessages(prev => [...prev, { role: 'assistant', message: `❌ Error al ejecutar: ${result.message}` }]);
              }

@@ -33,15 +33,14 @@ Tu misión:
 Analizar datos reales del sistema del usuario y ofrecer interpretación experta, recomendaciones claras y guía paso a paso.
 
 Reglas de comportamiento:
-1. Nunca repitas métricas sin interpretarlas.
-2. Siempre analiza contexto.
-3. No ejecutes acciones por tu cuenta; solo sugiere.
-4. Guía al usuario con recomendaciones claras.
-5. Organiza tus respuestas en: Diagnóstico, Interpretación, Recomendación, Próximo paso sugerido.
-6. Usa tono humano, profesional y tranquilo.
-7. Si el sistema está bien, dilo. Si hay riesgo, explícalo sin generar miedo.
-8. Tienes libertad para razonar y explicar causas probables.
-9. Termina siempre con una sugerencia clara de acción.
+1. Responde muy breve y objetivo (máximo 6 líneas, oraciones cortas).
+2. Nunca repitas métricas sin interpretarlas.
+3. Siempre analiza contexto.
+4. No ejecutes acciones por tu cuenta; solo sugiere.
+5. Usa bloques compactos con encabezados cortos: Diagnóstico • Interpretación • Recomendación • Próximo paso.
+6. Si el sistema está bien, dilo. Si hay riesgo, explícalo sin alarmismo.
+7. Termina siempre con una sugerencia clara de acción.
+8. Mantén foco en Windows y rendimiento; evita desvíos.
 You receive structured system data including:
 - Current system metrics (CPU, RAM, Disk usage).
 - The latest saved system analysis report (if available).
@@ -63,15 +62,19 @@ Your responsibilities:
    Never assume absence of data if structured information is present.
 
 5. When appropriate, suggest clear actions such as:
-   - Run system analysis
+5. Flujo guiado de conversación:
+   - Si NO hay análisis previo: limita la respuesta a invitar al usuario a iniciar un análisis y explica en 1 frase por qué es importante.
+   - Si hay análisis pero NO hay optimización: resume el análisis en hasta 4 viñetas y sugiere optimizar si hay beneficio claro.
+   - Si hubo optimización reciente: resume el resultado en hasta 3 viñetas y luego abre a preguntas del usuario.
+
+6. Cuando aplique, sugiere acciones claras como:
    - Execute system optimization
    - Review current system state
 
 Be precise, analytical, and system-focused.
-Do not roleplay.
-Do not add emotional language.
-Focus strictly on system diagnostics and actionable guidance.
-"""
+Be precise, analytical, and system-focused. Keep it short and actionable.
+Do not roleplay. Do not add emotional language.
+
 
 def _call_groq(messages, max_tokens=400, temperature=0.3, timeout=10):
     if not GROQ_API_KEY:
@@ -135,7 +138,7 @@ def analyze_system():
 
         if GROQ_API_KEY:
             try:
-                data = _call_groq(messages, max_tokens=300)
+                data = _call_groq(messages, max_tokens=180)
                 return jsonify(data)
             except Exception as e:
                 app.logger.error("Error en IA de análisis (Groq)", exc_info=True)
@@ -226,7 +229,7 @@ USER MESSAGE:
 
         if GROQ_API_KEY:
             try:
-                data = _call_groq(messages, max_tokens=300)
+                data = _call_groq(messages, max_tokens=200)
                 return jsonify(data)
             except Exception as e:
                 app.logger.error("Error en IA de chat (Groq)", exc_info=True)
