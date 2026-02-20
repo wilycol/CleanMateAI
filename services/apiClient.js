@@ -1,9 +1,10 @@
 const axios = require('axios');
 const log = require('electron-log');
 
-const API_ANALYZE_URL = 'https://cleanmateai-backend.onrender.com/api/analyze';
-const API_CHAT_URL = 'https://cleanmateai-backend.onrender.com/api/chat';
-const API_HEALTH_URL = 'https://cleanmateai-backend.onrender.com/api/ai-health';
+const BASE = process.env.CLEANMATE_BACKEND_URL || 'https://cleanmateai-backend.onrender.com';
+const API_ANALYZE_URL = `${BASE}/api/analyze`;
+const API_CHAT_URL = `${BASE}/api/chat`;
+const API_HEALTH_URL = `${BASE}/api/ai-health`;
 
 async function analyzeSystem(systemStats, cleanupStats) {
     try {
