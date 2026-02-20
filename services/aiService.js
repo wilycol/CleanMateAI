@@ -135,8 +135,11 @@ async function grokChatResponse(userMsg, context) {
 
     let actionSuggestion = null;
 
+    const lastAnalysis = context && context.lastAnalysis ? context.lastAnalysis : null;
+    const lastCleanup = context && context.lastCleanup ? context.lastCleanup : null;
+
     if (isClean) {
-        if (context.lastAnalysis && context.lastAnalysis.recoverableMB > 0) {
+        if (lastAnalysis && lastAnalysis.recoverableMB > 0) {
             actionSuggestion = {
                 type: 'clean',
                 targets: ['temp', 'cache_chrome', 'cache_edge'],
@@ -166,13 +169,35 @@ async function grokChatResponse(userMsg, context) {
         if (choice && choice.message && typeof choice.message.content === 'string' && choice.message.content.trim()) {
             response = choice.message.content;
         } else {
-            // Fallback local si la IA no devuelve contenido usable
             response = await generateAIResponse(userMsg, context);
         }
     } catch (e) {
         log.error('Fallo en chatWithAI', e);
-        // Fallback local si la llamada remota falla
         response = await generateAIResponse(userMsg, context);
+    }
+
+    // Flujo médico: si no hay acción aún, decidir según etapa
+    if (!actionSuggestion) {
+        if (!lastAnalysis && !lastCleanup) {
+            actionSuggestion = {
+                type: 'analyze',
+                label: 'Analizar sistema',
+                description: 'Primer paso recomendado según el estado actual'
+            };
+        } else if (lastAnalysis && !lastCleanup) {
+            actionSuggestion = {
+                type: 'clean',
+                targets: ['temp', 'cache_chrome', 'cache_edge'],
+                label: 'Optimizar sistema',
+                description: `Aplicar optimización usando el último análisis (${lastAnalysis.recoverableMB || 0} MB)`
+            };
+        } else if (lastCleanup) {
+            actionSuggestion = {
+                type: 'analyze',
+                label: 'Revisar de nuevo',
+                description: 'Nuevo análisis tras la última optimización'
+            };
+        }
     }
 
     return {
@@ -350,14 +375,20 @@ module.exports = {
 async function generateGreeting(mode = 'analysis') {
     const context = await buildSystemContext(mode);
     const metrics = context.systemMetrics || { cpuLoad: 0, ramUsed: 0, diskUsed: 0 };
+    const lastAnalysis = context.lastAnalysis || null;
+    const lastCleanup = context.lastCleanup || null;
     let greeting = `Hola. Estoy listo para asistirte en modo ${mode === 'optimization' ? 'Optimización' : mode === 'hardware' ? 'Hardware' : 'Análisis'}.`;
 
-    if (metrics.diskUsed > 90) {
-        greeting += ` ⚠️ Atención: Tu disco está al ${metrics.diskUsed}%. Te sugiero liberar espacio urgentemente.`;
-    } else if (context.lastAnalysis && context.lastAnalysis.recoverableMB > 1000) {
-        greeting += ` Detecté ${context.lastAnalysis.recoverableMB} MB recuperables del último análisis. ¿Procedemos?`;
-    } else {
-        greeting += ` Tu sistema parece estable (CPU: ${metrics.cpuLoad}%, RAM: ${metrics.ramUsed}%). ¿En qué puedo ayudarte hoy?`;
+    if (!lastAnalysis && !lastCleanup) {
+        if (metrics.diskUsed > 90 || metrics.cpuLoad > 80 || metrics.ramUsed > 80) {
+            greeting += ` Veo que tu sistema está muy exigido (CPU ${metrics.cpuLoad}%, RAM ${metrics.ramUsed}%, disco ${metrics.diskUsed}%). El primer paso recomendado es ejecutar un ANÁLISIS completo usando el botón "Análisis".`;
+        } else {
+            greeting += ` Tu sistema parece estable (CPU: ${metrics.cpuLoad}%, RAM: ${metrics.ramUsed}%). Aun así, el primer paso es un análisis rápido con el botón "Análisis" para ver oportunidades de mejora.`;
+        }
+    } else if (lastAnalysis && !lastCleanup) {
+        greeting += ` Ya tengo un análisis reciente con aproximadamente ${lastAnalysis.recoverableMB || 0} MB recuperables. El siguiente paso recomendado es OPTIMIZAR con el botón "Optimización".`;
+    } else if (lastCleanup) {
+        greeting += ` Tu última optimización liberó ${lastCleanup.freedMB || 0} MB y eliminó ${lastCleanup.filesDeleted || 0} archivos. Desde aquí podemos revisar dudas o hacer un nuevo análisis cuando quieras.`;
     }
 
     return greeting;
