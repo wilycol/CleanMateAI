@@ -5,7 +5,11 @@ import requests
 import json
 from datetime import datetime
 from dotenv import load_dotenv
-from services.state_service import load_state, get_clinical_mode, update_last_analysis, update_last_optimization, append_history
+
+try:
+    from .services.state_service import load_state, get_clinical_mode, update_last_analysis, update_last_optimization, append_history
+except ImportError:
+    from services.state_service import load_state, get_clinical_mode, update_last_analysis, update_last_optimization, append_history
 
 load_dotenv()
 
