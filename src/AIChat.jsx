@@ -20,10 +20,20 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
 
     const loadHistory = async () => {
         const history = await window.electronAPI.chatGetHistory();
-        setMessages(history);
+        const normalized = (history || []).map(entry => {
+            let msgText = entry.message;
+            if (msgText && typeof msgText === 'object') {
+                if (typeof msgText.response === 'string') {
+                    msgText = msgText.response;
+                } else {
+                    msgText = '';
+                }
+            }
+            return { ...entry, message: msgText };
+        });
+        setMessages(normalized);
         
-        // Intelligent Greeting if history is empty
-        if (history.length === 0) {
+        if (normalized.length === 0) {
             setStatus('thinking');
             try {
                 const greeting = await window.electronAPI.chatGetGreeting(mode);
