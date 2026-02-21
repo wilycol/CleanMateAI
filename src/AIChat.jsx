@@ -21,15 +21,19 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
     const loadHistory = async () => {
         const history = await window.electronAPI.chatGetHistory();
         const normalized = (history || []).map(entry => {
-            let msgText = entry.message;
-            if (msgText && typeof msgText === 'object') {
-                if (typeof msgText.response === 'string') {
-                    msgText = msgText.response;
-                } else {
-                    msgText = '';
-                }
+            let msgText = '';
+
+            if (typeof entry.message === 'string') {
+                msgText = entry.message;
+            } else if (entry.message && typeof entry.message === 'object' && typeof entry.message.response === 'string') {
+                msgText = entry.message.response;
             }
-            return { ...entry, message: msgText };
+
+            return {
+                ...entry,
+                message: msgText,
+                actionSuggestion: entry.nextAction || entry.actionSuggestion || null
+            };
         });
         setMessages(normalized);
         
@@ -65,18 +69,27 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
         try {
             const response = await window.electronAPI.chatSendMessage(text, mode);
             const normalized = (() => {
-                if (!response) return response;
-                let msgText = response.message;
-                if (msgText && typeof msgText === 'object') {
-                    if (typeof msgText.response === 'string') {
-                        msgText = msgText.response;
-                    } else {
-                        msgText = '';
-                    }
+                if (!response) return null;
+
+                let msgText = '';
+
+                if (typeof response.message === 'string') {
+                    msgText = response.message;
+                } else if (response.message && typeof response.message === 'object' && typeof response.message.response === 'string') {
+                    msgText = response.message.response;
                 }
-                return { ...response, message: msgText };
+
+                return {
+                    role: response.role || 'assistant',
+                    message: msgText,
+                    actionSuggestion: response.nextAction || response.actionSuggestion || null,
+                    mode: response.mode || null,
+                    timestamp: response.timestamp || new Date().toISOString()
+                };
             })();
-            setMessages(prev => [...prev, normalized]);
+            if (normalized) {
+                setMessages(prev => [...prev, normalized]);
+            }
         } catch (error) {
             console.error("Chat Error:", error);
             setMessages(prev => [...prev, { role: 'assistant', message: "Lo siento, tuve un error de conexión." }]);
@@ -210,7 +223,9 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
                             background: msg.role === 'user' ? '#007bff' : '#333',
                             color: 'white'
                         }}>
-                            <p style={{ margin: 0 }}>{msg.message}</p>
+                            <p style={{ margin: 0 }}>
+                                {typeof msg.message === 'string' ? msg.message : ''}
+                            </p>
                             
                             {msg.actionSuggestion && (
                                 <div style={styles.actionCard}>
