@@ -61,13 +61,13 @@ async function chatWithAI(message, context) {
             log.error('Chat API Status:', error.response.status);
         }
         return {
-            choices: [
-                {
-                    message: {
-                        content: "No se pudo conectar con la IA de chat. Verifique su conexión a internet."
-                    }
-                }
-            ]
+            message: "No se pudo conectar con la IA de chat. Verifique su conexión a internet.",
+            nextAction: {
+                type: "none",
+                label: "",
+                autoExecute: false
+            },
+            mode: "CONVERSATION"
         };
     }
 }

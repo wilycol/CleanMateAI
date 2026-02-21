@@ -128,234 +128,38 @@ async function processUserMessage(message, mode = 'analysis') {
 }
 
 async function grokChatResponse(userMsg, context) {
-    const msg = (userMsg || "").toLowerCase();
-
-    const isAnalyze = /\b(analizar|analisis|análisis|escanear|escaneo|scanear|diagnostico|diagnóstico)\b/.test(msg);
-    const isClean = /\b(limpiar|limpieza|borrar|eliminar|optimizar|optimizacion|optimización|basura)\b/.test(msg);
-
     let actionSuggestion = null;
-
-    const lastAnalysis = context && context.lastAnalysis ? context.lastAnalysis : null;
-    const lastCleanup = context && context.lastCleanup ? context.lastCleanup : null;
-
-    if (isClean) {
-        if (lastAnalysis && lastAnalysis.recoverableMB > 0) {
-            actionSuggestion = {
-                type: 'clean',
-                targets: ['temp', 'cache_chrome', 'cache_edge'],
-                label: 'Optimizar sistema',
-                description: 'Ejecutar optimización basada en el último análisis'
-            };
-        } else {
-            actionSuggestion = {
-                type: 'analyze',
-                label: 'Analizar antes de optimizar',
-                description: 'Realizar un análisis inicial del sistema'
-            };
-        }
-    } else if (isAnalyze) {
-        actionSuggestion = {
-            type: 'analyze',
-            label: 'Analizar sistema',
-            description: 'Ejecutar análisis desde el chat'
-        };
-    }
-
     let response = "";
 
     try {
         const apiResult = await chatWithAI(userMsg, context);
-        const choice = apiResult && apiResult.choices && apiResult.choices[0];
-        if (choice && choice.message && typeof choice.message.content === 'string' && choice.message.content.trim()) {
-            response = choice.message.content;
-        } else {
-            response = await generateAIResponse(userMsg, context);
+        const message = apiResult && typeof apiResult.message === 'string'
+            ? apiResult.message
+            : "";
+        const nextAction = apiResult && apiResult.nextAction ? apiResult.nextAction : null;
+
+        response = message || "No se recibió una respuesta válida del asistente remoto.";
+
+        if (nextAction && nextAction.type && nextAction.type !== 'none') {
+            if (nextAction.type === 'analyze') {
+                actionSuggestion = {
+                    type: 'analyze',
+                    label: nextAction.label || 'Analizar sistema',
+                    description: 'Ejecutar análisis recomendado por el asistente'
+                };
+            } else if (nextAction.type === 'optimize') {
+                actionSuggestion = {
+                    type: 'clean',
+                    targets: ['temp', 'cache_chrome', 'cache_edge'],
+                    label: nextAction.label || 'Optimizar sistema',
+                    description: 'Ejecutar optimización recomendada por el asistente'
+                };
+            }
         }
     } catch (e) {
         log.error('Fallo en chatWithAI', e);
-        response = await generateAIResponse(userMsg, context);
-    }
-
-    // Flujo médico: si no hay acción aún, decidir según etapa
-    if (!actionSuggestion) {
-        if (!lastAnalysis && !lastCleanup) {
-            actionSuggestion = {
-                type: 'analyze',
-                label: 'Analizar sistema',
-                description: 'Primer paso recomendado según el estado actual'
-            };
-        } else if (lastAnalysis && !lastCleanup) {
-            actionSuggestion = {
-                type: 'clean',
-                targets: ['temp', 'cache_chrome', 'cache_edge'],
-                label: 'Optimizar sistema',
-                description: `Aplicar optimización usando el último análisis (${lastAnalysis.recoverableMB || 0} MB)`
-            };
-        } else if (lastCleanup) {
-            actionSuggestion = {
-                type: 'analyze',
-                label: 'Revisar de nuevo',
-                description: 'Nuevo análisis tras la última optimización'
-            };
-        }
-    }
-
-    return {
-        response,
-        actionSuggestion
-    };
-}
-
-// Mock AI Logic - Enhanced with "Natural Persona" and Context Awareness
-async function generateAIResponse(userMsg, context) {
-    const msg = (userMsg || "").toLowerCase();
-    
-    // --- 1. Intent Detection Helper ---
-    const isGreeting = /\b(hola|buenos|buenas|hey|que tal)\b/.test(msg);
-    const isAnalyze = /\b(analizar|analisis|análisis|escanear|escaneo|scanear|verificar|diagnostico|diagnóstico)\b/.test(msg);
-    const isClean = /\b(limpiar|limpieza|borrar|eliminar|optimizar|optimizacion|optimización|optimiza|optimice|liberar|liberacion|basura)\b/.test(msg);
-    const isSlow = /\b(lento|trabado|pegado|lag|tarda|rapidez|velocidad)\b/.test(msg);
-    const isHistory = /\b(historial|reporte|reportes|anterior|pasado|ultimo|último)\b/.test(msg);
-    const isThanks = /\b(gracias|agradecido|genial|ok|listo|bueno)\b/.test(msg);
-    const isHelp = /\b(ayuda|socorro|que haces|para que sirves)\b/.test(msg);
-    const hasExecuteVerb = /\b(ejecuta|ejecutar|haz|haga|realiza|realizar|inicia|iniciar|comienza|comenzar|arranca|arrancar|aplica|aplicar|ya|ahora)\b/.test(msg);
-    const isStrongAnalyze = isAnalyze && hasExecuteVerb;
-    const isStrongClean = isClean && hasExecuteVerb;
-
-    // --- 2. Persona & Context Variables ---
-    const metrics = context && context.systemMetrics
-        ? context.systemMetrics
-        : { cpuLoad: 0, ramUsed: 0, diskUsed: 0 };
-    const { cpuLoad, ramUsed, diskUsed } = metrics;
-    const cpuHigh = cpuLoad > 80;
-    const ramHigh = ramUsed > 80;
-    const diskFull = diskUsed > 90;
-
-    const lastAnalysis = context && context.lastAnalysis ? context.lastAnalysis : null;
-    const reports = context && Array.isArray(context.reports) ? context.reports : [];
-    
-    // Natural conversation starters
-    const openers = [
-        "¡Hola! Soy tu asistente CleanMate.",
-        "Aquí estoy para ayudarte con tu PC.",
-        "¡Qué bueno verte por aquí!"
-    ];
-
-    let response = "";
-    let actionSuggestion = null;
-
-    // --- 3. Logic Engine ---
-    // 3.1 Intentos fuertes: el usuario pide ejecutar directamente
-    if (isStrongClean) {
-        if (lastAnalysis && lastAnalysis.recoverableMB > 0) {
-            response = `Perfecto, voy a ejecutar la optimización ahora mismo sobre lo que ya analizamos. 🧹\n\nSi notas algo raro, siempre puedes volver a escribirme.`;
-            actionSuggestion = {
-                type: 'clean',
-                targets: ['temp', 'cache_chrome', 'cache_edge'],
-                label: 'Optimizar sistema',
-                description: `Optimización solicitada por el usuario`,
-                autoExecute: true
-            };
-        } else {
-            response = `Puedo optimizar tu sistema, pero antes necesito hacer un análisis rápido para no tocar nada sensible. Empezaré con un escaneo y luego continúo con la limpieza.`;
-            actionSuggestion = {
-                type: 'analyze',
-                label: 'Analizar y optimizar',
-                description: 'Escaneo previo antes de limpiar',
-                autoExecute: true
-            };
-        }
-    } else if (isStrongAnalyze) {
-        response = `Entendido, iniciaré un análisis completo de tu sistema ahora mismo para ver qué podemos mejorar.`;
-        actionSuggestion = {
-            type: 'analyze',
-            label: 'Iniciar análisis',
-            description: 'Análisis solicitado por el usuario',
-            autoExecute: true
-        };
-    } else if (isGreeting) {
-        const status = (cpuHigh || ramHigh || diskFull) 
-            ? "Veo que tu sistema está trabajando duro hoy." 
-            : "Tu sistema se ve bastante tranquilo por ahora.";
-        
-        response = `${openers[Math.floor(Math.random() * openers.length)]} ${status}
-        
-📊 **Vistazo Rápido:**
-• CPU: ${cpuLoad}% ${cpuHigh ? '🔥' : '✅'}
-• RAM: ${ramUsed}% ${ramHigh ? '⚠️' : '✅'}
-• Disco: ${diskUsed}% ${diskFull ? '⛔' : '✅'}
-
-¿Te gustaría que hagamos un chequeo más profundo?`;
-
-        actionSuggestion = { type: 'analyze', label: 'Hacer Chequeo', description: 'Revisión rápida' };
-
-    } else if (isAnalyze) {
-        response = "¡Entendido! Me pondré mi gorra de detective 🕵️‍♂️. \n\nVoy a buscar archivos temporales, cachés olvidados y cosas que están ocupando espacio sin pagar renta. ¿Me das luz verde para escanear?";
-        actionSuggestion = {
-            type: 'analyze',
-            label: 'Iniciar Escaneo',
-            description: 'Buscar archivos basura'
-        };
-
-    } else if (isClean) {
-        if (lastAnalysis && lastAnalysis.recoverableMB > 0) {
-            response = `¡Manos a la obra! 🧹\n\nSegún lo que vi, podemos recuperar unos **${lastAnalysis.recoverableMB} MB**. Eso le dará un respiro a tu disco. ¿Procedemos con la limpieza?`;
-            actionSuggestion = {
-                type: 'clean',
-                targets: ['temp', 'cache_chrome', 'cache_edge'],
-                label: 'Ejecutar Limpieza',
-                description: `Liberar ~${context.lastAnalysis.recoverableMB} MB`
-            };
-        } else {
-            response = "¡Claro! Pero para no borrar nada importante a ciegas, primero necesito echar un vistazo rápido. ¿Hacemos un escaneo primero?";
-            actionSuggestion = { type: 'analyze', label: 'Escanear Primero', description: 'Por seguridad' };
-        }
-
-    } else if (isSlow || isHelp) {
-        if (ramHigh) {
-            response = "Uff, sí... noto que tu memoria RAM está sudando (está al " + ramUsed + "%). 😰\n\n**Mi consejo:**\n1. Cierra las pestañas del navegador que no uses.\n2. Déjame limpiar los archivos temporales para aligerar la carga.\n\n¿Te ayudo con la limpieza?";
-            actionSuggestion = { type: 'analyze', label: 'Analizar para Optimizar', description: 'Aligerar sistema' };
-        } else if (diskFull) {
-            response = "El problema podría ser tu disco duro. Está casi lleno (" + diskUsed + "%). Cuando el disco se llena, todo se mueve en cámara lenta. 🐢\n\n¡Necesitamos liberar espacio urgente!";
-            actionSuggestion = { type: 'analyze', label: 'Liberar Espacio', description: 'Urgente: Disco Lleno' };
-        } else {
-            response = "Tu hardware parece estar bien en los números (CPU y RAM normales), pero a veces la 'basura digital' oculta ralentiza todo. \n\nPropongo hacer una limpieza de mantenimiento. ¿Qué dices?";
-            actionSuggestion = { type: 'analyze', label: 'Mantenimiento Preventivo', description: 'Optimizar flujo' };
-        }
-
-    } else if (isHistory) {
-        if (reports && reports.length > 0) {
-            const last = reports[0];
-            if (last.type === 'cleanup' && last.stats) {
-                response = `Haciendo memoria... 🤔\n\nLa última vez (el ${new Date(last.timestamp).toLocaleDateString()}) eliminamos **${last.stats.filesDeleted} archivos** y recuperamos **${last.stats.freedMB} MB**. ¡Fue un buen trabajo!`;
-            } else {
-                const detectedMB = last.stats?.spaceRecoverableMB ?? 0;
-                const detectedFiles = last.stats?.fileCount ?? 0;
-                response = `Revisando registros... 📚\n\nEn el último análisis (el ${new Date(last.timestamp).toLocaleDateString()}) detectamos aproximadamente **${detectedMB} MB** potencialmente recuperables en **${detectedFiles} archivos**.`;
-            }
-        } else {
-            response = "Aún no tenemos historias de batallas pasadas. ¡Esta podría ser nuestra primera victoria contra los archivos basura! ¿Empezamos?";
-            actionSuggestion = { type: 'analyze', label: 'Iniciar Misión', description: 'Primer análisis' };
-        }
-
-    } else if (isThanks) {
-        response = "¡De nada! Es un placer mantener tu PC en forma. Si notas cualquier otra cosa rara, aquí estaré. 👋";
-
-    } else {
-        // --- 4. Off-Topic / Fallback Handler (The "Affectionate Guide") ---
-        const offTopicResponses = [
-            "Me encanta tu curiosidad, pero mi cerebro digital está diseñado específicamente para cuidar de tu PC. 🖥️ ¿Volvemos a revisar por qué tu sistema podría ir más rápido?",
-            "¡Qué tema tan interesante! Aunque confieso que me pierdo un poco si no hablamos de Gigabytes y procesadores. 😅 ¿Te parece si nos enfocamos en optimizar tu equipo?",
-            "Aprecio la charla, de verdad. Pero soy un especialista en rendimiento y limpieza, y no quisiera darte consejos equivocados sobre otros temas. ¿Cómo sientes la velocidad de tu PC hoy?",
-            "Ay, me encantaría saber de eso, pero mis circuitos solo entienden de optimización y limpieza. 🧹 Regresemos a lo nuestro: ¿Te gustaría hacer un análisis rápido?"
-        ];
-        
-        response = offTopicResponses[Math.floor(Math.random() * offTopicResponses.length)];
-        
-        // Always offer a way back to the main path
-        if (!actionSuggestion) {
-             actionSuggestion = { type: 'analyze', label: 'Ver Estado del PC', description: 'Volver al tema' };
-        }
+        response = "En este momento no puedo conectar con el servicio avanzado de IA. Puedes seguir usando los botones principales de análisis y optimización de la aplicación.";
+        actionSuggestion = null;
     }
 
     return {
@@ -368,7 +172,6 @@ module.exports = {
     processUserMessage, 
     getChatHistory, 
     clearChatHistory,
-    generateAIResponse, // Exported for testing/direct use
     generateGreeting
 };
 

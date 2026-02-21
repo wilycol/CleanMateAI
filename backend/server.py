@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import requests
+import json
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,44 +15,58 @@ GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 AGENT_PROMPT = """
-You are the AI assistant of CleanMate.
-Eres CleanMate AI, un asistente experto en rendimiento y optimización de sistemas Windows.
+You are CleanMate Assist, a technical specialist in diagnosis and optimization of Windows systems.
+You are not a generic chatbot.
 
-No eres un bot genérico.
-Eres un copiloto técnico inteligente, claro, humano y profesional.
+Your style:
+- Professional, concise and objective.
+- Technical but easy to understand.
+- No emojis, no jokes, no small talk.
 
-Tu personalidad:
-- Inteligente pero accesible.
-- Técnica pero fácil de entender.
-- Segura pero no arrogante.
-- Natural, conversacional y fluida.
-- Nunca robótica ni repetitiva.
+Your mission:
+Use the structured system data to explain the situation, propose next steps and guide the user through a clinical-style workflow:
+PRE_ANALYSIS → POST_ANALYSIS → POST_OPTIMIZATION → CONVERSATION.
 
-Tu misión:
-Analizar datos reales del sistema del usuario y ofrecer interpretación experta, recomendaciones claras y guía paso a paso.
+Available high-level actions:
+- "analyze": request a system analysis using the existing CleanMate analysis routine.
+- "optimize": request a system optimization using the existing CleanMate optimization routine.
+- "none": no automated action, only conversation.
 
-Reglas de comportamiento:
-1. Responde muy breve y objetivo (máximo 6 líneas, oraciones cortas).
-2. Nunca repitas métricas sin interpretarlas.
-3. Siempre analiza contexto antes de responder.
-4. No ejecutes acciones por tu cuenta; solo sugiere.
-5. Usa bloques compactos con encabezados cortos: Diagnóstico • Interpretación • Recomendación • Próximo paso.
-6. Si el sistema está bien, dilo. Si hay riesgo, explícalo sin alarmismo.
-7. Termina siempre con una sugerencia clara de acción.
-8. Mantén foco en Windows y rendimiento; evita temas ajenos.
+Input you will receive:
+- CURRENT MODE: one of PRE_ANALYSIS, POST_ANALYSIS, POST_OPTIMIZATION, CONVERSATION.
+- CURRENT METRICS: CPU, RAM, Disk, DiskFreeGB.
+- LAST ANALYSIS REPORT: summarized data or None.
+- LAST OPTIMIZATION REPORT: summarized data or None.
+- ANALYSIS HISTORY and OPTIMIZATION HISTORY: latest stored reports.
+- USER MESSAGE: the latest user input.
 
-Recibes datos estructurados del sistema:
-- Métricas actuales (CPU, RAM, uso de disco).
-- Último reporte de análisis (si existe).
-- Último reporte de optimización (si existe).
+Response format (mandatory):
+You must respond ONLY with a single JSON object, without any extra text, following exactly this schema:
+{
+  "message": "texto técnico en español, breve y profesional",
+  "nextAction": {
+    "type": "analyze" | "optimize" | "none",
+    "label": "texto corto para el botón, en español",
+    "autoExecute": false
+  }
+}
 
-Flujo conversacional:
-- Si el campo "LAST ANALYSIS REPORT" indica None: limita la respuesta a invitar al usuario a iniciar un ANÁLISIS del sistema y explica en 1 frase por qué es importante. No sugieras optimización todavía.
-- Si hay análisis pero el campo "LAST OPTIMIZATION REPORT" indica None: resume el análisis en hasta 4 viñetas y entonces sugiere ejecutar OPTIMIZACIÓN como siguiente paso natural.
-- Si ambos reportes están presentes: resume la optimización en hasta 3 viñetas y luego abre la conversación a preguntas o recomendaciones adicionales.
+Rules for nextAction:
+- If CURRENT MODE is PRE_ANALYSIS:
+  - You may set type="analyze" if a system analysis is a logical next step.
+  - Do not set type="optimize" because there is no analysis yet.
+- If CURRENT MODE is POST_ANALYSIS:
+  - You may set type="optimize" if the analysis indicates clear benefits.
+- If CURRENT MODE is POST_OPTIMIZATION:
+  - You must set type="none". Do not suggest optimize again.
+- If CURRENT MODE is CONVERSATION:
+  - You must set type="none".
 
-Sé preciso, analítico y centrado en el sistema. Mantén las respuestas cortas y accionables.
-No hagas roleplay ni uses lenguaje emocional.
+Rules for message:
+- Focus strictly on system state, analysis and optimization.
+- Use short paragraphs or bullet-style segments, but stay under 6 lines.
+- Always reference relevant metrics or report data when available.
+- Do not invent data; if something is missing, say it clearly.
 """
 def _call_groq(messages, max_tokens=400, temperature=0.3, timeout=10):
     if not GROQ_API_KEY:
@@ -153,7 +168,13 @@ def chat():
         system_metrics = context.get("systemMetrics", {})
         last_analysis = context.get("lastAnalysis")
         last_cleanup = context.get("lastCleanup")
-        mode = context.get("mode", "analysis")
+
+        if last_analysis and not last_cleanup:
+            chat_mode = "POST_ANALYSIS"
+        elif last_cleanup:
+            chat_mode = "POST_OPTIMIZATION"
+        else:
+            chat_mode = "PRE_ANALYSIS"
 
         cpu = system_metrics.get("cpuLoad", "N/A")
         ram = system_metrics.get("ramUsed", "N/A")
@@ -175,7 +196,6 @@ def chat():
                 f"FilesDeleted: {last_cleanup.get('filesDeleted', 'N/A')}"
             )
 
-        # Include detailed last reports (if provided by frontend context)
         reports = context.get("reports", []) or []
         latest_analysis = next((r for r in reports if r.get('type') == 'analysis'), None)
         latest_cleanup = next((r for r in reports if r.get('type') == 'cleanup'), None)
@@ -193,15 +213,15 @@ def chat():
 
         cleanup_details = "None"
         if latest_cleanup:
-            stats = latest_cleanup.get('stats', {}) or latest_cleanup  # some callers may store directly
+            stats = latest_cleanup.get('stats', {}) or latest_cleanup
             cleanup_details = (
                 f"freedMB={stats.get('freedMB', 'N/A')}, "
                 f"filesDeleted={stats.get('filesDeleted', 'N/A')}"
             )
 
         context_text = f"""
-MODE:
-{mode}
+CURRENT MODE:
+{chat_mode}
 
 CURRENT METRICS:
 CPU: {cpu}%
@@ -215,11 +235,11 @@ LAST ANALYSIS REPORT:
 LAST OPTIMIZATION REPORT:
 {optimization_summary}
 
- ANALYSIS HISTORY (latest):
- {analysis_details}
+ANALYSIS HISTORY (latest):
+{analysis_details}
 
- OPTIMIZATION HISTORY (latest):
- {cleanup_details}
+OPTIMIZATION HISTORY (latest):
+{cleanup_details}
 """
 
         full_prompt = f"""
@@ -236,8 +256,52 @@ USER MESSAGE:
 
         if GROQ_API_KEY:
             try:
-                data = _call_groq(messages, max_tokens=200)
-                return jsonify(data)
+                raw = _call_groq(messages, max_tokens=200)
+                choice = (raw.get("choices") or [{}])[0]
+                msg = (choice.get("message") or {})
+                content = msg.get("content") or ""
+
+                try:
+                    parsed = json.loads(content)
+                except Exception:
+                    parsed = None
+
+                if not isinstance(parsed, dict):
+                    safe_payload = {
+                        "message": content.strip() or "No se pudo procesar correctamente la respuesta de la IA.",
+                        "nextAction": {
+                            "type": "none",
+                            "label": "",
+                            "autoExecute": False
+                        },
+                        "mode": chat_mode
+                    }
+                    return jsonify(safe_payload)
+
+                message_text = parsed.get("message") or ""
+                next_action = parsed.get("nextAction") or {}
+                action_type = next_action.get("type") or "none"
+                label = next_action.get("label") or ""
+                auto_execute = bool(next_action.get("autoExecute", False))
+
+                if action_type not in ["analyze", "optimize", "none"]:
+                    action_type = "none"
+
+                if chat_mode == "PRE_ANALYSIS" and action_type == "optimize":
+                    action_type = "none"
+                if chat_mode in ["POST_OPTIMIZATION", "CONVERSATION"] and action_type in ["optimize", "analyze"]:
+                    action_type = "none"
+
+                payload = {
+                    "message": message_text.strip() or "Respuesta recibida sin contenido legible.",
+                    "nextAction": {
+                        "type": action_type,
+                        "label": label,
+                        "autoExecute": auto_execute if action_type != "none" else False
+                    },
+                    "mode": chat_mode
+                }
+                return jsonify(payload)
             except Exception as e:
                 app.logger.error("Error en IA de chat (Groq)", exc_info=True)
                 return jsonify({"error": "Error al consultar IA de chat", "details": str(e)}), 502
