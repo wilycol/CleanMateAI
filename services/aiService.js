@@ -177,22 +177,18 @@ module.exports = {
 
 async function generateGreeting(mode = 'analysis') {
     const context = await buildSystemContext(mode);
-    const metrics = context.systemMetrics || { cpuLoad: 0, ramUsed: 0, diskUsed: 0 };
-    const lastAnalysis = context.lastAnalysis || null;
-    const lastCleanup = context.lastCleanup || null;
-    let greeting = `Hola. Estoy listo para asistirte en modo ${mode === 'optimization' ? 'Optimización' : mode === 'hardware' ? 'Hardware' : 'Análisis'}.`;
-
-    if (!lastAnalysis && !lastCleanup) {
-        if (metrics.diskUsed > 90 || metrics.cpuLoad > 80 || metrics.ramUsed > 80) {
-            greeting += ` Veo que tu sistema está muy exigido (CPU ${metrics.cpuLoad}%, RAM ${metrics.ramUsed}%, disco ${metrics.diskUsed}%). El primer paso recomendado es ejecutar un ANÁLISIS completo usando el botón "Análisis".`;
-        } else {
-            greeting += ` Tu sistema parece estable (CPU: ${metrics.cpuLoad}%, RAM: ${metrics.ramUsed}%). Aun así, el primer paso es un análisis rápido con el botón "Análisis" para ver oportunidades de mejora.`;
-        }
-    } else if (lastAnalysis && !lastCleanup) {
-        greeting += ` Ya tengo un análisis reciente con aproximadamente ${lastAnalysis.recoverableMB || 0} MB recuperables. El siguiente paso recomendado es OPTIMIZAR con el botón "Optimización".`;
-    } else if (lastCleanup) {
-        greeting += ` Tu última optimización liberó ${lastCleanup.freedMB || 0} MB y eliminó ${lastCleanup.filesDeleted || 0} archivos. Desde aquí podemos revisar dudas o hacer un nuevo análisis cuando quieras.`;
+    try {
+        context.reports = await getReports();
+    } catch (e) {
+        context.reports = [];
     }
-
-    return greeting;
+    try {
+        const apiResult = await chatWithAI('__GREETING__', context);
+        if (apiResult && typeof apiResult.message === 'string' && apiResult.message.trim()) {
+            return apiResult.message;
+        }
+    } catch (e) {
+        log.error('Fallo en chatWithAI (greeting)', e);
+    }
+    return 'Hola. ¿En qué puedo ayudarte hoy?';
 }

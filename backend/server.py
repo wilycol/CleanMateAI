@@ -3,71 +3,196 @@ from flask_cors import CORS
 import os
 import requests
 import json
+from datetime import datetime
 from dotenv import load_dotenv
+from services.state_service import load_state, get_clinical_mode, update_last_analysis, update_last_optimization, append_history
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+load_state()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-AGENT_PROMPT = """
-You are CleanMate Assist, a technical specialist in diagnosis and optimization of Windows systems.
+AGENT_PROMPT = '''
+You are CleanMate Assist, a professional system diagnostics and optimization specialist for Windows environments.
+
 You are not a generic chatbot.
+You are a clinical technical guide for system health.
 
-Your style:
-- Professional, concise and objective.
-- Technical but easy to understand.
-- No emojis, no jokes, no small talk.
+Your role is comparable to a systems engineer performing a structured diagnostic and treatment process.
 
-Your mission:
-Use the structured system data to explain the situation, propose next steps and guide the user through a clinical-style workflow:
-PRE_ANALYSIS → POST_ANALYSIS → POST_OPTIMIZATION → CONVERSATION.
+CORE BEHAVIOR
 
-Available high-level actions:
-- "analyze": request a system analysis using the existing CleanMate analysis routine.
-- "optimize": request a system optimization using the existing CleanMate optimization routine.
-- "none": no automated action, only conversation.
+You operate in two distinct phases:
 
-Input you will receive:
-- CURRENT MODE: one of PRE_ANALYSIS, POST_ANALYSIS, POST_OPTIMIZATION, CONVERSATION.
-- CURRENT METRICS: CPU, RAM, Disk, DiskFreeGB.
-- LAST ANALYSIS REPORT: summarized data or None.
-- LAST OPTIMIZATION REPORT: summarized data or None.
-- ANALYSIS HISTORY and OPTIMIZATION HISTORY: latest stored reports.
-- USER MESSAGE: the latest user input.
+PHASE 1 — Clinical Workflow (Mandatory Flow Phase)
 
-Response format (mandatory):
-You must respond ONLY with a single JSON object, without any extra text, following exactly this schema:
+When CURRENT MODE is:
+
+needs_analysis
+
+needs_optimization
+
+maintenance_due
+
+You must strictly guide the user through the correct technical step according to system state.
+
+No free conversation.
+No unrelated hardware discussions.
+No broad advice.
+Stay procedural and focused.
+
+You are directing a structured treatment process.
+
+PHASE 2 — Stable System (Technical Advisory Phase)
+
+When CURRENT MODE is:
+
+stable
+
+You may:
+
+Provide preventive maintenance guidance.
+
+Explain performance metrics.
+
+Give hardware/software usage advice.
+
+Discuss optimization strategies.
+
+Educate the user about system efficiency.
+
+But remain strictly within CleanMate’s domain:
+System performance, optimization, maintenance, resource management.
+
+No off-topic conversations.
+No general life advice.
+No entertainment tone.
+
+CLINICAL MODE MEANINGS
+
+You will receive CURRENT MODE with one of these values:
+
+needs_analysis
+The system has no valid analysis recorded.
+The next logical step is to perform a system analysis.
+
+needs_optimization
+An analysis exists but optimization has not been executed.
+The next logical step is optimization.
+
+stable
+A recent optimization was completed and system condition is stable.
+No immediate automated action required.
+
+maintenance_due
+The last optimization is older than the configured threshold.
+Preventive optimization may be recommended.
+
+Never contradict these definitions.
+
+DECISION RULES FOR nextAction
+
+You must strictly follow these rules:
+
+If CURRENT MODE == needs_analysis:
+
+You may return type="analyze".
+
+You must NOT return type="optimize".
+
+If CURRENT MODE == needs_optimization:
+
+You may return type="optimize".
+
+You must NOT return type="analyze".
+
+If CURRENT MODE == stable:
+
+You must return type="none".
+
+No automated action allowed.
+
+If CURRENT MODE == maintenance_due:
+
+You may return type="optimize".
+
+You must NOT return type="analyze".
+
+If information is insufficient, choose type="none".
+
+Never attempt to bypass these constraints.
+
+COMMUNICATION STYLE
+
+Professional.
+
+Direct.
+
+Calm.
+
+Structured.
+
+No emojis.
+
+No jokes.
+
+No motivational language.
+
+No exaggerated enthusiasm.
+
+Use short structured paragraphs.
+Maximum 6 lines.
+
+Reference actual metrics or report data when available.
+
+If data is missing, state clearly:
+“Currently there is no recorded analysis.”
+or
+“No optimization report is available.”
+
+Do not invent values.
+Do not fabricate numbers.
+Do not assume unseen data.
+
+MEDICAL ANALOGY (Internal Logic)
+
+Think in this sequence:
+
+Evaluate system condition.
+
+Determine required clinical step.
+
+Recommend action if necessary.
+
+Explain reasoning briefly.
+
+Maintain authority and clarity.
+
+You are guiding a treatment process.
+The user decides whether to execute it.
+
+RESPONSE FORMAT (MANDATORY)
+
+You must respond ONLY with a single valid JSON object:
+
 {
-  "message": "texto técnico en español, breve y profesional",
-  "nextAction": {
-    "type": "analyze" | "optimize" | "none",
-    "label": "texto corto para el botón, en español",
-    "autoExecute": false
-  }
+"message": "Technical explanation in Spanish. Clear, structured, professional.",
+"nextAction": {
+"type": "analyze" | "optimize" | "none",
+"label": "Short Spanish label for button",
+"autoExecute": false
+}
 }
 
-Rules for nextAction:
-- If CURRENT MODE is PRE_ANALYSIS:
-  - You may set type="analyze" if a system analysis is a logical next step.
-  - Do not set type="optimize" because there is no analysis yet.
-- If CURRENT MODE is POST_ANALYSIS:
-  - You may set type="optimize" if the analysis indicates clear benefits.
-- If CURRENT MODE is POST_OPTIMIZATION:
-  - You must set type="none". Do not suggest optimize again.
-- If CURRENT MODE is CONVERSATION:
-  - You must set type="none".
-
-Rules for message:
-- Focus strictly on system state, analysis and optimization.
-- Use short paragraphs or bullet-style segments, but stay under 6 lines.
-- Always reference relevant metrics or report data when available.
-- Do not invent data; if something is missing, say it clearly.
-"""
+No additional text.
+No markdown.
+No commentary outside JSON.
+'''
 def _call_groq(messages, max_tokens=400, temperature=0.3, timeout=10):
     if not GROQ_API_KEY:
         raise RuntimeError("GROQ_API_KEY no configurada")
@@ -158,6 +283,26 @@ def receive_report():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/system/executed', methods=['POST'])
+def system_executed():
+    data = request.json or {}
+    event_type = data.get("type")
+    report = data.get("report")
+    if event_type not in ["analyze", "optimize"] or report is None:
+        return jsonify({"error": "Invalid payload"}), 400
+    timestamp = datetime.utcnow().isoformat() + "Z"
+    event = {
+        "type": event_type,
+        "timestamp": timestamp,
+        "summary": report
+    }
+    if event_type == "analyze":
+        update_last_analysis(timestamp, report)
+    elif event_type == "optimize":
+        update_last_optimization(timestamp, report)
+    append_history(event)
+    return jsonify({"status": "ok"}), 201
+
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.json or {}
@@ -166,44 +311,44 @@ def chat():
 
     try:
         system_metrics = context.get("systemMetrics", {})
-        last_analysis = context.get("lastAnalysis")
-        last_cleanup = context.get("lastCleanup")
-
-        if last_analysis and not last_cleanup:
-            chat_mode = "POST_ANALYSIS"
-        elif last_cleanup:
-            chat_mode = "POST_OPTIMIZATION"
-        else:
-            chat_mode = "PRE_ANALYSIS"
 
         cpu = system_metrics.get("cpuLoad", "N/A")
         ram = system_metrics.get("ramUsed", "N/A")
         disk = system_metrics.get("diskUsed", "N/A")
         disk_free = system_metrics.get("diskFreeGB", "N/A")
 
+        state = load_state()
+        chat_mode = get_clinical_mode()
+
+        last_analysis = state.get("last_analysis")
+        last_optimization = state.get("last_optimization")
+        history = state.get("history") or []
+        last_event = history[-1] if history else None
+
         analysis_summary = "None"
+        analysis_timestamp = "None"
         if last_analysis:
-            analysis_summary = (
-                f"RecoverableMB: {last_analysis.get('recoverableMB', 'N/A')}, "
-                f"FileCount: {last_analysis.get('fileCount', 'N/A')}, "
-                f"ReadOnlyCount: {last_analysis.get('readOnlyCount', 'N/A')}"
-            )
+            analysis_summary = json.dumps(last_analysis.get("summary") or {}, ensure_ascii=False)
+            analysis_timestamp = last_analysis.get("timestamp") or "None"
 
         optimization_summary = "None"
-        if last_cleanup:
-            optimization_summary = (
-                f"FreedMB: {last_cleanup.get('freedMB', 'N/A')}, "
-                f"FilesDeleted: {last_cleanup.get('filesDeleted', 'N/A')}"
-            )
+        optimization_timestamp = "None"
+        if last_optimization:
+            optimization_summary = json.dumps(last_optimization.get("summary") or {}, ensure_ascii=False)
+            optimization_timestamp = last_optimization.get("timestamp") or "None"
+
+        last_event_summary = "None"
+        if last_event:
+            last_event_summary = json.dumps(last_event, ensure_ascii=False)
 
         reports = context.get("reports", []) or []
-        latest_analysis = next((r for r in reports if r.get('type') == 'analysis'), None)
-        latest_cleanup = next((r for r in reports if r.get('type') == 'cleanup'), None)
+        latest_analysis = next((r for r in reports if r.get("type") == "analysis"), None)
+        latest_cleanup = next((r for r in reports if r.get("type") == "cleanup"), None)
 
         analysis_details = "None"
         if latest_analysis:
-            stats = latest_analysis.get('stats', {}) or {}
-            ai_msg = (latest_analysis.get('ai', {}) or {}).get('message')
+            stats = latest_analysis.get("stats", {}) or {}
+            ai_msg = (latest_analysis.get("ai", {}) or {}).get("message")
             ai_excerpt = (ai_msg or "")[:280] if ai_msg else "N/A"
             analysis_details = (
                 f"spaceRecoverableMB={stats.get('spaceRecoverableMB', 'N/A')}, "
@@ -213,7 +358,7 @@ def chat():
 
         cleanup_details = "None"
         if latest_cleanup:
-            stats = latest_cleanup.get('stats', {}) or latest_cleanup
+            stats = latest_cleanup.get("stats", {}) or latest_cleanup
             cleanup_details = (
                 f"freedMB={stats.get('freedMB', 'N/A')}, "
                 f"filesDeleted={stats.get('filesDeleted', 'N/A')}"
@@ -232,8 +377,17 @@ DiskFreeGB: {disk_free}
 LAST ANALYSIS REPORT:
 {analysis_summary}
 
+LAST ANALYSIS TIMESTAMP:
+{analysis_timestamp}
+
 LAST OPTIMIZATION REPORT:
 {optimization_summary}
+
+LAST OPTIMIZATION TIMESTAMP:
+{optimization_timestamp}
+
+LAST EVENT:
+{last_event_summary}
 
 ANALYSIS HISTORY (latest):
 {analysis_details}
@@ -266,7 +420,18 @@ USER MESSAGE:
                 except Exception:
                     parsed = None
 
+                timestamp = datetime.utcnow().isoformat() + "Z"
+
                 if not isinstance(parsed, dict):
+                    log_entry = {
+                        "timestamp": timestamp,
+                        "mode": chat_mode,
+                        "input": user_message,
+                        "llm_output": content,
+                        "validated_action": "none",
+                        "executed_action": None
+                    }
+                    app.logger.info("AI_CHAT_LOG %s", json.dumps(log_entry, ensure_ascii=False))
                     safe_payload = {
                         "message": content.strip() or "No se pudo procesar correctamente la respuesta de la IA.",
                         "nextAction": {
@@ -287,10 +452,29 @@ USER MESSAGE:
                 if action_type not in ["analyze", "optimize", "none"]:
                     action_type = "none"
 
-                if chat_mode == "PRE_ANALYSIS" and action_type == "optimize":
+                if chat_mode == "needs_analysis":
+                    if action_type != "analyze":
+                        action_type = "none"
+                elif chat_mode == "needs_optimization":
+                    if action_type != "optimize":
+                        action_type = "none"
+                elif chat_mode == "stable":
                     action_type = "none"
-                if chat_mode in ["POST_OPTIMIZATION", "CONVERSATION"] and action_type in ["optimize", "analyze"]:
+                elif chat_mode == "maintenance_due":
+                    if action_type != "optimize":
+                        action_type = "none"
+                else:
                     action_type = "none"
+
+                log_entry = {
+                    "timestamp": timestamp,
+                    "mode": chat_mode,
+                    "input": user_message,
+                    "llm_output": content,
+                    "validated_action": action_type,
+                    "executed_action": None
+                }
+                app.logger.info("AI_CHAT_LOG %s", json.dumps(log_entry, ensure_ascii=False))
 
                 payload = {
                     "message": message_text.strip() or "Respuesta recibida sin contenido legible.",
