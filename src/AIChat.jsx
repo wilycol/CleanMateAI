@@ -64,7 +64,19 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
         
         try {
             const response = await window.electronAPI.chatSendMessage(text, mode);
-            setMessages(prev => [...prev, response]);
+            const normalized = (() => {
+                if (!response) return response;
+                let msgText = response.message;
+                if (msgText && typeof msgText === 'object') {
+                    if (typeof msgText.response === 'string') {
+                        msgText = msgText.response;
+                    } else {
+                        msgText = '';
+                    }
+                }
+                return { ...response, message: msgText };
+            })();
+            setMessages(prev => [...prev, normalized]);
         } catch (error) {
             console.error("Chat Error:", error);
             setMessages(prev => [...prev, { role: 'assistant', message: "Lo siento, tuve un error de conexión." }]);
