@@ -120,6 +120,9 @@ def receive_report():
 @app.route('/api/system/executed', methods=['POST'])
 def system_executed():
     data = request.json or {}
+    print("=== SYSTEM EXECUTED CALLED ===")
+    print("PAYLOAD:", data)
+    print("================================")
     event_type = data.get("type")
     report = data.get("report")
     if event_type not in ["analyze", "optimize"] or report is None:
@@ -135,6 +138,12 @@ def system_executed():
     elif event_type == "optimize":
         update_last_optimization(timestamp, report)
     append_history(event)
+    state = load_state()
+    print("AFTER EXECUTION STATE:")
+    print("LAST_ANALYSIS:", state.get("last_analysis"))
+    print("LAST_OPTIMIZATION:", state.get("last_optimization"))
+    print("CLINICAL_MODE:", get_clinical_mode())
+    print("================================")
     return jsonify({"status": "ok"}), 201
 
 def _build_chat_context_and_prompt(user_message, context, session_state):
@@ -239,6 +248,8 @@ USER MESSAGE:
 
 def _run_chat_llm(user_message, context, session_state):
     session_state = touch_session(session_state.get("id"))
+    print("CHAT SESSION STATE BEFORE LLM:")
+    print(session_state)
     full_prompt, clinical_mode = _build_chat_context_and_prompt(user_message, context, session_state)
     system_prompt = get_system_prompt(session_state)
 

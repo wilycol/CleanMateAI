@@ -58,6 +58,11 @@ def update_last_analysis(timestamp, summary):
         "summary": summary
     }
     save_state(state)
+    print("=== STATE DEBUG (AFTER ANALYSIS) ===")
+    print("LAST_ANALYSIS:", state.get("last_analysis"))
+    print("LAST_OPTIMIZATION:", state.get("last_optimization"))
+    print("CLINICAL_MODE_CALCULATED:", get_clinical_mode())
+    print("====================================")
 
 
 def update_last_optimization(timestamp, summary):
@@ -67,6 +72,11 @@ def update_last_optimization(timestamp, summary):
         "summary": summary
     }
     save_state(state)
+    print("=== STATE DEBUG (AFTER OPTIMIZATION) ===")
+    print("LAST_ANALYSIS:", state.get("last_analysis"))
+    print("LAST_OPTIMIZATION:", state.get("last_optimization"))
+    print("CLINICAL_MODE_CALCULATED:", get_clinical_mode())
+    print("========================================")
 
 
 def append_history(event_object):
@@ -92,17 +102,34 @@ def get_clinical_mode():
     state = load_state()
     last_analysis = state.get("last_analysis")
     last_optimization = state.get("last_optimization")
+    print("=== STATE DEBUG (GET_CLINICAL_MODE INPUT) ===")
+    print("LAST_ANALYSIS:", last_analysis)
+    print("LAST_OPTIMIZATION:", last_optimization)
     if not last_analysis:
-        return "needs_analysis"
+        clinical_mode = "needs_analysis"
+        print("CLINICAL_MODE_CALCULATED:", clinical_mode)
+        print("===========================================")
+        return clinical_mode
     if last_analysis and not last_optimization:
-        return "needs_optimization"
+        clinical_mode = "needs_optimization"
+        print("CLINICAL_MODE_CALCULATED:", clinical_mode)
+        print("===========================================")
+        return clinical_mode
     ts_opt = _parse_timestamp((last_optimization or {}).get("timestamp"))
     if ts_opt is None:
-        return "maintenance_due"
+        clinical_mode = "maintenance_due"
+        print("CLINICAL_MODE_CALCULATED:", clinical_mode)
+        print("===========================================")
+        return clinical_mode
     now = datetime.now(timezone.utc)
     hours = (now - ts_opt).total_seconds() / 3600.0
     threshold_hours = float(os.getenv("CLINICAL_OPTIMIZATION_THRESHOLD_HOURS", "72"))
     if hours <= threshold_hours:
-        return "stable"
-    return "maintenance_due"
-
+        clinical_mode = "stable"
+        print("CLINICAL_MODE_CALCULATED:", clinical_mode)
+        print("===========================================")
+        return clinical_mode
+    clinical_mode = "maintenance_due"
+    print("CLINICAL_MODE_CALCULATED:", clinical_mode)
+    print("===========================================")
+    return clinical_mode
