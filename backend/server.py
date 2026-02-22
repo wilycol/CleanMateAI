@@ -354,6 +354,8 @@ def _run_chat_llm(user_message, context, session_state):
 @app.route('/api/chat/start', methods=['POST'])
 def chat_start():
     session_state = create_session()
+    print("CHAT_START ENDPOINT HIT")
+    print("SESSION_ID_CREATED:", session_state.get("id"))
     return jsonify({"sessionId": session_state.get("id"), "sessionState": session_state}), 201
 
 
@@ -364,14 +366,25 @@ def chat_message():
     user_message = data.get("userMessage", "")
     context = data.get("context") or {}
 
+    print("CHAT_MESSAGE ENDPOINT HIT")
+    print("SESSION_ID_FROM_REQUEST:", session_id)
+
     if not user_message:
         return jsonify({"error": "Mensaje vacío"}), 400
 
+    created_new = False
     session_state = None
     if session_id:
         session_state = get_session(session_id)
-    if session_state is None:
+        if session_state is None:
+            print("CHAT_MESSAGE SESSION NOT FOUND, NOT CREATING NEW")
+            return jsonify({"error": "Sesión no encontrada"}), 404
+    else:
         session_state = create_session()
+        created_new = True
+
+    print("SESSION_ID_USED:", session_state.get("id"))
+    print("SESSION_WAS_CREATED:", created_new)
 
     payload, status_code = _run_chat_llm(user_message, context, session_state)
     return jsonify(payload), status_code
