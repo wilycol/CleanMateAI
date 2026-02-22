@@ -1,0 +1,44 @@
+[
+  {
+    "role": "user",
+    "message": "Perfecto, sí, ayúdame con mi equipo, está demasiado lento.",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-22T17:12:56.160Z"
+  },
+  {
+    "role": "assistant",
+    "message": "Para comenzar a analizar el problema de lentitud de su equipo, necesitamos recopilar información sobre su sistema. La alta utilización de CPU y RAM puede estar causando el problema. ¿Puede decirme qué programas o aplicaciones tiene actualmente abiertas en su equipo?\n\n{\n\"message\": \"Necesitamos analizar el sistema para determinar la causa de la lentitud.\",\n\"nextAction\": {\n\"type\": \"analyze\",\n\"label\": \"Iniciar Análisis\",\n\"autoExecute\": false\n}\n}",
+    "actionSuggestion": null,
+    "mode": "guided_flow",
+    "timestamp": "2026-02-22T17:12:57.500Z"
+  },
+  {
+    "role": "user",
+    "message": "Perdón, no entiendo lo que me quieres decir. Pensé que ibas a analizar El sistema",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-22T17:13:40.981Z"
+  },
+  {
+    "role": "assistant",
+    "message": "Para comenzar el análisis, necesito que me proporciones acceso al sistema. \nDebes ejecutar la herramienta de análisis de CleanMate. \nEsto nos permitirá obtener información detallada sobre el estado actual del sistema.\n\n{\n\"message\": \"Por favor, ejecuta la herramienta de análisis de CleanMate para obtener información detallada sobre el estado del sistema.\",\n\"nextAction\": {\n\"type\": \"analyze\",\n\"label\": \"Ejecutar análisis\",\n\"autoExecute\": false\n}\n}",
+    "actionSuggestion": null,
+    "mode": "guided_flow",
+    "timestamp": "2026-02-22T17:13:42.045Z"
+  },
+  {
+    "role": "user",
+    "message": "¿Me vas a ayudar, sí o no? ¿Puedes ayudarme? Hay un mensaje extraño. Que aparece ahora que me estás dando justo aquí en el chat. Me gustaría que me ayudaras. Analizar el sistema",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-22T17:14:24.417Z"
+  },
+  {
+    "role": "assistant",
+    "message": "message: Para ayudarte de manera efectiva, es necesario analizar el estado actual de tu sistema. El mensaje extraño que mencionas puede estar relacionado con los altos niveles de utilización de CPU y RAM que se observan en tus métricas actuales. \nnextAction: {\n\"type\": \"analyze\",\n\"label\": \"Analizar sistema\",\n\"autoExecute\": false\n}",
+    "actionSuggestion": null,
+    "mode": "guided_flow",
+    "timestamp": "2026-02-22T17:14:29.829Z"
+  }
+]
