@@ -144,9 +144,34 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
                 return;
             }
             setMessages([]);
-            await loadHistory(); // Reload greeting
+            await loadHistory();
         } catch (e) {
             setMessages(prev => [...prev, { role: 'assistant', message: "Error al borrar historial (IPC)." }]);
+        }
+    };
+
+    const handleDownloadChat = () => {
+        if (!messages || messages.length === 0) return;
+
+        try {
+            const exportPayload = messages.map(m => ({
+                role: m.role || null,
+                message: typeof m.message === 'string' ? m.message : '',
+                actionSuggestion: m.actionSuggestion || null,
+                mode: m.mode || null,
+                timestamp: m.timestamp || null
+            }));
+
+            const element = document.createElement("a");
+            const file = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'text/plain' });
+            const safeDate = new Date().toISOString().replace(/[:.]/g, '-');
+            element.href = URL.createObjectURL(file);
+            element.download = `CleanMate_Chat_${safeDate}.json`;
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        } catch (e) {
+            console.error('Error al descargar chat', e);
         }
     };
 
@@ -262,6 +287,7 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
 
             <div style={styles.inputArea}>
                 <button onClick={handleClearHistory} style={styles.iconBtn} title="Borrar historial">🗑️</button>
+                <button onClick={handleDownloadChat} style={styles.iconBtn} title="Descargar chat">💾</button>
                 <button 
                     onClick={startVoiceInput} 
                     style={{...styles.iconBtn, color: status === 'recording' ? '#ff4444' : '#888'}} 
