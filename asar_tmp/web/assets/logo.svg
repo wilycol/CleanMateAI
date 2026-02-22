@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <!-- Shield Background -->
+  <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0z" fill="url(#grad1)" opacity="0.1"/>
+  
+  <!-- Central Tech/AI Node Structure -->
+  <g transform="translate(106, 106) scale(0.6)" fill="none" stroke="url(#grad1)" stroke-width="25" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Hexagon Shape -->
+    <path d="M256 48l160 96v192l-160 96-160-96V144z" />
+    
+    <!-- Internal Circuitry/Brain Connections -->
+    <path d="M256 160v192" />
+    <path d="M160 210l96 50 96-50" />
+    <path d="M160 300l96-50 96 50" />
+    
+    <!-- AI Spark/Clean Symbol in Center -->
+    <circle cx="256" cy="256" r="40" fill="#3b82f6" stroke="none" filter="url(#glow)"/>
+  </g>
+  
+  <!-- Broom/Sweep Element Integrated -->
+  <path d="M360 120 L400 80 M380 140 L410 110" stroke="#60a5fa" stroke-width="20" stroke-linecap="round" />
+</svg>
