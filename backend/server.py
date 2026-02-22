@@ -123,14 +123,16 @@ def system_executed():
     print("===========================================")
     print("SYSTEM EXECUTED ENDPOINT HIT")
     print("PAYLOAD:", data)
+    event_type = data.get("type")
+    report = data.get("report")
+    print("TYPE:", event_type)
+    print("REPORT:", report)
     state_before = load_state()
     print("STATE BEFORE UPDATE:")
     print("LAST_ANALYSIS:", state_before.get("last_analysis"))
     print("LAST_OPTIMIZATION:", state_before.get("last_optimization"))
     print("CLINICAL_MODE_BEFORE:", get_clinical_mode())
     print("===========================================")
-    event_type = data.get("type")
-    report = data.get("report")
     if event_type not in ["analyze", "optimize"] or report is None:
         return jsonify({"error": "Invalid payload"}), 400
     timestamp = datetime.utcnow().isoformat() + "Z"

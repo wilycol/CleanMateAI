@@ -158,6 +158,7 @@ app.whenReady().then(() => {
 
         updateLastCleanup(result);
         try {
+            log.info('NOTIFY SYSTEM EXECUTED CALLED', { type: 'optimize', report: result });
             await notifySystemExecuted('optimize', result);
         } catch (e) {
             log.error('Failed to notify backend system_executed (cleanup):', e);
@@ -292,6 +293,7 @@ app.whenReady().then(() => {
             log.error('Failed to auto-save analysis report:', e);
         }
         try {
+            log.info('NOTIFY SYSTEM EXECUTED CALLED', { type: 'analyze', report: finalResult });
             await notifySystemExecuted('analyze', finalResult);
         } catch (e) {
             log.error('Failed to notify backend system_executed (analysis):', e);
@@ -411,6 +413,7 @@ app.whenReady().then(() => {
                 log.error('Failed to save cleanup report (chat action):', e);
             }
             try {
+                log.info('NOTIFY SYSTEM EXECUTED CALLED', { type: 'optimize', report: result });
                 await notifySystemExecuted('optimize', result);
             } catch (e) {
                 log.error('Failed to notify backend system_executed (chat cleanup):', e);
