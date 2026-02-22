@@ -4,7 +4,12 @@ const log = require('electron-log');
 const BASE = process.env.CLEANMATE_BACKEND_URL || 'https://cleanmateai-backend.onrender.com';
 const API_ANALYZE_URL = `${BASE}/api/analyze`;
 const API_CHAT_URL = `${BASE}/api/chat`;
+const API_CHAT_START_URL = `${BASE}/api/chat/start`;
+const API_CHAT_MESSAGE_URL = `${BASE}/api/chat/message`;
+const API_SYSTEM_EXECUTED_URL = `${BASE}/api/system/executed`;
 const API_HEALTH_URL = `${BASE}/api/ai-health`;
+
+let chatSessionId = null;
 
 async function analyzeSystem(systemStats, cleanupStats) {
     try {
@@ -46,12 +51,20 @@ async function analyzeSystem(systemStats, cleanupStats) {
 async function chatWithAI(message, context) {
     try {
         log.info('Sending chat to AI backend...');
+        if (!chatSessionId) {
+            const startRes = await axios.post(API_CHAT_START_URL, {}, { timeout: 5000 });
+            if (startRes && startRes.data && startRes.data.sessionId) {
+                chatSessionId = startRes.data.sessionId;
+            }
+        }
+
         const payload = {
-            message,
+            sessionId: chatSessionId,
+            userMessage: message,
             context
         };
 
-        const response = await axios.post(API_CHAT_URL, payload, { timeout: 8000 });
+        const response = await axios.post(API_CHAT_MESSAGE_URL, payload, { timeout: 8000 });
         log.info('Chat AI response received successfully');
         return response.data;
     } catch (error) {
@@ -60,6 +73,7 @@ async function chatWithAI(message, context) {
             log.error('Chat API Response Data:', error.response.data);
             log.error('Chat API Status:', error.response.status);
         }
+        chatSessionId = null;
         return {
             message: "No se pudo conectar con la IA de chat. Verifique su conexión a internet.",
             nextAction: {
@@ -69,6 +83,19 @@ async function chatWithAI(message, context) {
             },
             mode: "CONVERSATION"
         };
+    }
+}
+
+async function notifySystemExecuted(type, report) {
+    try {
+        const payload = { type, report };
+        await axios.post(API_SYSTEM_EXECUTED_URL, payload, { timeout: 5000 });
+    } catch (error) {
+        log.error('System executed notify error:', error.message);
+        if (error.response) {
+            log.error('System executed response data:', error.response.data);
+            log.error('System executed status:', error.response.status);
+        }
     }
 }
 
@@ -99,4 +126,4 @@ async function checkAIConnectivity() {
     return result;
 }
 
-module.exports = { analyzeSystem, chatWithAI, checkAIConnectivity };
+module.exports = { analyzeSystem, chatWithAI, checkAIConnectivity, notifySystemExecuted };

@@ -80,8 +80,7 @@ async function clearChatHistory() {
 
 async function processUserMessage(message, mode = 'analysis') {
     const startTime = Date.now();
-    // 1. Build Context
-    const context = await buildSystemContext(mode);
+    const context = await buildSystemContext('analysis');
     try {
         context.reports = await getReports();
     } catch (e) {
@@ -92,7 +91,6 @@ async function processUserMessage(message, mode = 'analysis') {
         ? context.systemMetrics
         : { cpuLoad: 0, ramUsed: 0 };
 
-    // 2. Save User Message
     const userEntry = {
         timestamp: new Date().toISOString(),
         role: 'user',
@@ -106,20 +104,20 @@ async function processUserMessage(message, mode = 'analysis') {
 
     const aiResponse = await grokChatResponse(message, context);
 
-    // 4. Save Assistant Message
     const assistantEntry = {
         timestamp: new Date().toISOString(),
         role: 'assistant',
         message: aiResponse.response,
-        actionSuggestion: aiResponse.actionSuggestion || null
+        actionSuggestion: aiResponse.actionSuggestion || null,
+        mode: aiResponse.mode || null,
+        sessionState: aiResponse.sessionState || null
     };
     await saveChatEntry(assistantEntry);
 
-    // Log Metrics
     const duration = Date.now() - startTime;
     logAIMetrics({
         type: 'interaction',
-        mode,
+        mode: 'analysis',
         duration,
         hasAction: !!aiResponse.actionSuggestion
     });
@@ -130,6 +128,8 @@ async function processUserMessage(message, mode = 'analysis') {
 async function grokChatResponse(userMsg, context) {
     let actionSuggestion = null;
     let response = "";
+    let mode = null;
+    let sessionState = null;
 
     try {
         const apiResult = await chatWithAI(userMsg, context);
@@ -137,6 +137,8 @@ async function grokChatResponse(userMsg, context) {
             ? apiResult.message
             : "";
         const nextAction = apiResult && apiResult.nextAction ? apiResult.nextAction : null;
+        mode = apiResult && apiResult.mode ? apiResult.mode : null;
+        sessionState = apiResult && apiResult.sessionState ? apiResult.sessionState : null;
 
         response = message || "No se recibió una respuesta válida del asistente remoto.";
 
@@ -164,7 +166,9 @@ async function grokChatResponse(userMsg, context) {
 
     return {
         response,
-        actionSuggestion
+        actionSuggestion,
+        mode,
+        sessionState
     };
 }
 

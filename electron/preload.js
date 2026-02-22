@@ -12,11 +12,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     runSystemTool: (tool) => ipcRenderer.invoke('run-system-tool', tool),
     
     // Chat API
-    chatSendMessage: (message, mode) => ipcRenderer.invoke('chat-send-message', { message, mode }),
+    chatSendMessage: (message) => ipcRenderer.invoke('chat-send-message', { message }),
     chatGetHistory: () => ipcRenderer.invoke('chat-get-history'),
     chatClearHistory: () => ipcRenderer.invoke('chat-clear-history'),
     chatExecuteAction: (action) => ipcRenderer.invoke('chat-execute-action', action),
-    chatGetGreeting: (mode) => ipcRenderer.invoke('chat-get-greeting', mode),
+    chatGetGreeting: () => ipcRenderer.invoke('chat-get-greeting'),
     getAIStatus: () => ipcRenderer.invoke('get-ai-status'),
     
     minimize: () => ipcRenderer.send('window-minimize'),

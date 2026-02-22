@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
-    const [status, setStatus] = useState('idle'); // idle, thinking, recording
-    const [mode, setMode] = useState('analysis'); // analysis, optimization, hardware
+    const [status, setStatus] = useState('idle');
+    const [agentMode, setAgentMode] = useState(null);
     const messagesEndRef = useRef(null);
     const recognitionRef = useRef(null);
 
@@ -40,7 +40,7 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
         if (normalized.length === 0) {
             setStatus('thinking');
             try {
-                const greeting = await window.electronAPI.chatGetGreeting(mode);
+                const greeting = await window.electronAPI.chatGetGreeting();
                 setMessages([{ role: 'assistant', message: greeting }]);
             } catch (e) {
                 console.error("Failed to get greeting", e);
@@ -67,7 +67,7 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
         setStatus('thinking');
         
         try {
-            const response = await window.electronAPI.chatSendMessage(text, mode);
+            const response = await window.electronAPI.chatSendMessage(text);
             const normalized = (() => {
                 if (!response) return null;
 
@@ -79,13 +79,17 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
                     msgText = response.message.response;
                 }
 
-                return {
+                const entry = {
                     role: response.role || 'assistant',
                     message: msgText,
                     actionSuggestion: response.nextAction || response.actionSuggestion || null,
                     mode: response.mode || null,
                     timestamp: response.timestamp || new Date().toISOString()
                 };
+                if (entry.mode) {
+                    setAgentMode(entry.mode);
+                }
+                return entry;
             })();
             if (normalized) {
                 setMessages(prev => [...prev, normalized]);
@@ -220,18 +224,9 @@ const AIChat = ({ isOpen, onClose, onActionTrigger, onActionComplete }) => {
                 <div style={{display: 'flex', flexDirection: 'column'}}>
                     <span>🤖 CleanMate Copilot</span>
                     <div style={styles.modeSelector}>
-                        <span 
-                            style={mode === 'analysis' ? styles.modeActive : styles.mode} 
-                            onClick={() => setMode('analysis')}
-                        >Análisis</span>
-                        <span 
-                            style={mode === 'optimization' ? styles.modeActive : styles.mode} 
-                            onClick={() => setMode('optimization')}
-                        >Optimización</span>
-                         <span 
-                            style={mode === 'hardware' ? styles.modeActive : styles.mode} 
-                            onClick={() => setMode('hardware')}
-                        >HW</span>
+                        <span style={styles.modeActive}>
+                            {agentMode === 'free_consultation' ? 'Consulta libre' : 'Flujo guiado'}
+                        </span>
                     </div>
                 </div>
                 <button onClick={onClose} style={styles.closeBtn}>×</button>

@@ -4,7 +4,7 @@ const log = require('electron-log');
 const { spawn } = require('child_process');
 const { getSystemStats } = require('../services/monitor');
 const { cleanSystem, analyzeSystem: scanJunk } = require('../services/cleaner');
-const { analyzeSystem: askAI, checkAIConnectivity } = require('../services/apiClient');
+const { analyzeSystem: askAI, checkAIConnectivity, notifySystemExecuted } = require('../services/apiClient');
 const { saveReport, getReports } = require('../services/reportManager');
 const { processUserMessage, getChatHistory, clearChatHistory } = require('../services/aiService');
 const { updateLastAnalysis, updateLastCleanup } = require('../services/systemContextBuilder');
@@ -157,6 +157,11 @@ app.whenReady().then(() => {
         }
 
         updateLastCleanup(result);
+        try {
+            await notifySystemExecuted('optimize', result);
+        } catch (e) {
+            log.error('Failed to notify backend system_executed (cleanup):', e);
+        }
         return result;
     });
 
@@ -286,17 +291,22 @@ app.whenReady().then(() => {
         } catch (e) {
             log.error('Failed to auto-save analysis report:', e);
         }
+        try {
+            await notifySystemExecuted('analyze', finalResult);
+        } catch (e) {
+            log.error('Failed to notify backend system_executed (analysis):', e);
+        }
         return finalResult;
     });
 
     // Chat IPC Handlers
-    ipcMain.handle('chat-get-greeting', async (event, mode) => {
+    ipcMain.handle('chat-get-greeting', async () => {
         const { generateGreeting } = require('../services/aiService');
-        return await generateGreeting(mode);
+        return await generateGreeting();
     });
 
-    ipcMain.handle('chat-send-message', async (event, { message, mode }) => {
-        return await processUserMessage(message, mode);
+    ipcMain.handle('chat-send-message', async (event, { message }) => {
+        return await processUserMessage(message);
     });
 
     ipcMain.handle('chat-get-history', async () => {
@@ -399,6 +409,11 @@ app.whenReady().then(() => {
                 });
             } catch (e) {
                 log.error('Failed to save cleanup report (chat action):', e);
+            }
+            try {
+                await notifySystemExecuted('optimize', result);
+            } catch (e) {
+                log.error('Failed to notify backend system_executed (chat cleanup):', e);
             }
             return { success: true, result };
         }
