@@ -120,9 +120,15 @@ def receive_report():
 @app.route('/api/system/executed', methods=['POST'])
 def system_executed():
     data = request.json or {}
-    print("=== SYSTEM EXECUTED CALLED ===")
+    print("===========================================")
+    print("SYSTEM EXECUTED ENDPOINT HIT")
     print("PAYLOAD:", data)
-    print("================================")
+    state_before = load_state()
+    print("STATE BEFORE UPDATE:")
+    print("LAST_ANALYSIS:", state_before.get("last_analysis"))
+    print("LAST_OPTIMIZATION:", state_before.get("last_optimization"))
+    print("CLINICAL_MODE_BEFORE:", get_clinical_mode())
+    print("===========================================")
     event_type = data.get("type")
     report = data.get("report")
     if event_type not in ["analyze", "optimize"] or report is None:
@@ -138,12 +144,12 @@ def system_executed():
     elif event_type == "optimize":
         update_last_optimization(timestamp, report)
     append_history(event)
-    state = load_state()
-    print("AFTER EXECUTION STATE:")
-    print("LAST_ANALYSIS:", state.get("last_analysis"))
-    print("LAST_OPTIMIZATION:", state.get("last_optimization"))
-    print("CLINICAL_MODE:", get_clinical_mode())
-    print("================================")
+    state_after = load_state()
+    print("STATE AFTER UPDATE (POST EXECUTION):")
+    print("LAST_ANALYSIS:", state_after.get("last_analysis"))
+    print("LAST_OPTIMIZATION:", state_after.get("last_optimization"))
+    print("CLINICAL_MODE_AFTER:", get_clinical_mode())
+    print("===========================================")
     return jsonify({"status": "ok"}), 201
 
 def _build_chat_context_and_prompt(user_message, context, session_state):

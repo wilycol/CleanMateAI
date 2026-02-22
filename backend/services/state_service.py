@@ -53,30 +53,44 @@ def save_state(state):
 
 def update_last_analysis(timestamp, summary):
     state = load_state()
+    print("===================================")
+    print("STATE_SERVICE UPDATE_LAST_ANALYSIS CALLED")
+    print("STATE BEFORE UPDATE:")
+    print(state)
     state["last_analysis"] = {
         "timestamp": timestamp,
         "summary": summary
     }
+    print("STATE AFTER UPDATE (BEFORE SAVE):")
+    print(state)
     save_state(state)
-    print("=== STATE DEBUG (AFTER ANALYSIS) ===")
-    print("LAST_ANALYSIS:", state.get("last_analysis"))
-    print("LAST_OPTIMIZATION:", state.get("last_optimization"))
+    persisted = load_state()
+    print("STATE AFTER PERSIST (ANALYSIS):")
+    print("LAST_ANALYSIS:", persisted.get("last_analysis"))
+    print("LAST_OPTIMIZATION:", persisted.get("last_optimization"))
     print("CLINICAL_MODE_CALCULATED:", get_clinical_mode())
-    print("====================================")
+    print("===================================")
 
 
 def update_last_optimization(timestamp, summary):
     state = load_state()
+    print("===================================")
+    print("STATE_SERVICE UPDATE_LAST_OPTIMIZATION CALLED")
+    print("STATE BEFORE UPDATE:")
+    print(state)
     state["last_optimization"] = {
         "timestamp": timestamp,
         "summary": summary
     }
+    print("STATE AFTER UPDATE (BEFORE SAVE):")
+    print(state)
     save_state(state)
-    print("=== STATE DEBUG (AFTER OPTIMIZATION) ===")
-    print("LAST_ANALYSIS:", state.get("last_analysis"))
-    print("LAST_OPTIMIZATION:", state.get("last_optimization"))
+    persisted = load_state()
+    print("STATE AFTER PERSIST (OPTIMIZATION):")
+    print("LAST_ANALYSIS:", persisted.get("last_analysis"))
+    print("LAST_OPTIMIZATION:", persisted.get("last_optimization"))
     print("CLINICAL_MODE_CALCULATED:", get_clinical_mode())
-    print("========================================")
+    print("===================================")
 
 
 def append_history(event_object):
