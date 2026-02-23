@@ -1,0 +1,1036 @@
+{
+  "id": "1771804995833",
+  "timestamp": "2026-02-23T00:03:15.833Z",
+  "type": "cleanup",
+  "stats": {
+    "freedMB": 2.84,
+    "filesDeleted": 104,
+    "errors": [
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\No_Vary_Search\\journal.baj",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\No_Vary_Search\\journal.baj'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\Cache_Data\\data_3",
+        "error": "EPERM: operation not permitted, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\Cache_Data\\data_3'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\Cache_Data\\data_2",
+        "error": "EPERM: operation not permitted, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\Cache_Data\\data_2'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\Cache_Data\\data_1",
+        "error": "EPERM: operation not permitted, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\Cache_Data\\data_1'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\Cache_Data\\data_0",
+        "error": "EPERM: operation not permitted, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\Cache_Data\\data_0'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\Cache_Data\\index",
+        "error": "EPERM: operation not permitted, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache\\Cache_Data\\index'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\e7e7d6cd-830f-4857-a86b-428773308ab6.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\e7e7d6cd-830f-4857-a86b-428773308ab6.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\e7e7d6cd-830f-4857-a86b-428773308ab6.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\e7e7d6cd-830f-4857-a86b-428773308ab6.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\20192e15-657d-4f54-a772-df0d078c3fc2.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\20192e15-657d-4f54-a772-df0d078c3fc2.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\20192e15-657d-4f54-a772-df0d078c3fc2.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\20192e15-657d-4f54-a772-df0d078c3fc2.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\6b36236f-1309-4204-ac3b-a10a2e935431.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\6b36236f-1309-4204-ac3b-a10a2e935431.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\6b36236f-1309-4204-ac3b-a10a2e935431.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\6b36236f-1309-4204-ac3b-a10a2e935431.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\0b00186e-b980-4a4c-8bc1-d6a0f1c37745.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\0b00186e-b980-4a4c-8bc1-d6a0f1c37745.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\0b00186e-b980-4a4c-8bc1-d6a0f1c37745.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\0b00186e-b980-4a4c-8bc1-d6a0f1c37745.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\f0f220b4-37c4-4b72-a0a2-0c58d0dedf90.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\f0f220b4-37c4-4b72-a0a2-0c58d0dedf90.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\f0f220b4-37c4-4b72-a0a2-0c58d0dedf90.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\f0f220b4-37c4-4b72-a0a2-0c58d0dedf90.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\c7275cd1-eb0e-4d7e-aac9-d234a828eb2f.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\c7275cd1-eb0e-4d7e-aac9-d234a828eb2f.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\c7275cd1-eb0e-4d7e-aac9-d234a828eb2f.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\c7275cd1-eb0e-4d7e-aac9-d234a828eb2f.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\f139ee66-4d14-4b16-95a3-fe563751ddec.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\f139ee66-4d14-4b16-95a3-fe563751ddec.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\f139ee66-4d14-4b16-95a3-fe563751ddec.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\f139ee66-4d14-4b16-95a3-fe563751ddec.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\2dc88902-ac5e-4ee3-885a-a9e0130e910c.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\2dc88902-ac5e-4ee3-885a-a9e0130e910c.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\df641c37-5e44-4a67-9107-c6c072a97dcb.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\df641c37-5e44-4a67-9107-c6c072a97dcb.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\2dc88902-ac5e-4ee3-885a-a9e0130e910c.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\2dc88902-ac5e-4ee3-885a-a9e0130e910c.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\df641c37-5e44-4a67-9107-c6c072a97dcb.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\df641c37-5e44-4a67-9107-c6c072a97dcb.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\c4338891-cf99-4394-a54c-9ebe929ffdba.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\c4338891-cf99-4394-a54c-9ebe929ffdba.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\c4338891-cf99-4394-a54c-9ebe929ffdba.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\c4338891-cf99-4394-a54c-9ebe929ffdba.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\e3d4e687-c876-4bb6-a97d-b98563da3825.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\e3d4e687-c876-4bb6-a97d-b98563da3825.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\e3d4e687-c876-4bb6-a97d-b98563da3825.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\e3d4e687-c876-4bb6-a97d-b98563da3825.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\14442775-fac1-4789-8a63-05ac2c1eceec.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\14442775-fac1-4789-8a63-05ac2c1eceec.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\1c7e0e9c-865d-4528-967d-edce3c3afcbd.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\1c7e0e9c-865d-4528-967d-edce3c3afcbd.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\356aa891-71f5-4e6f-91a9-250d184c17b8.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\356aa891-71f5-4e6f-91a9-250d184c17b8.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\3b5d5bca-f954-40c8-b8e4-21e70cc2d6cf.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\3b5d5bca-f954-40c8-b8e4-21e70cc2d6cf.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\6e7ff285-5f5a-438c-bb9e-ee6ef56e6efc.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\6e7ff285-5f5a-438c-bb9e-ee6ef56e6efc.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\7727663d-29c9-4ca1-bfbc-fd1caf3544cf.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\7727663d-29c9-4ca1-bfbc-fd1caf3544cf.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\89c22773-a318-4336-8b0b-2375cc3aaa68.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\89c22773-a318-4336-8b0b-2375cc3aaa68.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\ba3dd05a-08ee-41ff-b123-9cda09a7decc.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\ba3dd05a-08ee-41ff-b123-9cda09a7decc.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\d504e21b-7731-4e8a-8333-8cdcf9819358.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\d504e21b-7731-4e8a-8333-8cdcf9819358.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\dda60e04-3537-4656-afd3-c80bf6967bc7.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\dda60e04-3537-4656-afd3-c80bf6967bc7.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\f5763ee9-bc71-4d1c-a9c3-73217113ff57.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\f5763ee9-bc71-4d1c-a9c3-73217113ff57.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\14442775-fac1-4789-8a63-05ac2c1eceec.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\14442775-fac1-4789-8a63-05ac2c1eceec.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\1c7e0e9c-865d-4528-967d-edce3c3afcbd.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\1c7e0e9c-865d-4528-967d-edce3c3afcbd.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\356aa891-71f5-4e6f-91a9-250d184c17b8.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\356aa891-71f5-4e6f-91a9-250d184c17b8.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\3b5d5bca-f954-40c8-b8e4-21e70cc2d6cf.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\3b5d5bca-f954-40c8-b8e4-21e70cc2d6cf.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\6e7ff285-5f5a-438c-bb9e-ee6ef56e6efc.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\6e7ff285-5f5a-438c-bb9e-ee6ef56e6efc.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\7727663d-29c9-4ca1-bfbc-fd1caf3544cf.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\7727663d-29c9-4ca1-bfbc-fd1caf3544cf.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\89c22773-a318-4336-8b0b-2375cc3aaa68.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\89c22773-a318-4336-8b0b-2375cc3aaa68.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\ba3dd05a-08ee-41ff-b123-9cda09a7decc.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\ba3dd05a-08ee-41ff-b123-9cda09a7decc.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\d504e21b-7731-4e8a-8333-8cdcf9819358.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\d504e21b-7731-4e8a-8333-8cdcf9819358.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\dda60e04-3537-4656-afd3-c80bf6967bc7.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\dda60e04-3537-4656-afd3-c80bf6967bc7.tmp'"
+      },
+      {
+        "path": "C:\\Users\\Usuario\\AppData\\Local\\Temp\\f5763ee9-bc71-4d1c-a9c3-73217113ff57.tmp",
+        "error": "EBUSY: resource busy or locked, unlink 'C:\\Users\\Usuario\\AppData\\Local\\Temp\\f5763ee9-bc71-4d1c-a9c3-73217113ff57.tmp'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_125842_880.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_125842_880.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_130304_457.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_130304_457.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_192900_175.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_192900_175.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_062059_960.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_062059_960.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_214645_403.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_214645_403.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_215204_173.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_215204_173.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_064555_562.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_064555_562.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_064922_595.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_064922_595.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_065420_157.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_065420_157.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_065556_072.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_065556_072.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_123301_374.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_123301_374.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_123744_121.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_123744_121.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_124100_110.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_124100_110.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_124812_129.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_124812_129.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_124924_237.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_124924_237.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_125652_362.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_125652_362.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_130655_696.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_130655_696.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_131127_020.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_131127_020.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_131441_189.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_131441_189.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_131934_498.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_131934_498.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_132115_951.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_132115_951.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_133610_744.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_133610_744.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_133934_633.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_133934_633.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_142421_914.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_142421_914.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_142725_530.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_142725_530.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_144135_506.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_144135_506.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_144328_114.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_144328_114.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_150503_238.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_150503_238.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_150953_753.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_150953_753.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_155539_786.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_155539_786.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_161043_236.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_161043_236.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_162553_908.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_162553_908.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_164110_361.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_164110_361.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_165947_480.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_165947_480.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_193400_624.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_193400_624.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_194128_502.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_194128_502.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_195033_216.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_195033_216.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_195719_713.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_195719_713.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_202054_142.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_202054_142.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_202513_559.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_202513_559.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_205145_591.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_205145_591.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_210045_128.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_210045_128.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_210955_038.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_210955_038.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_211759_239.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_211759_239.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_213525_307.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_213525_307.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_214025_351.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_214025_351.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_214410_094.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_214410_094.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_215343_088.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_215343_088.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_215922_444.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_215922_444.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_223333_260.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_223333_260.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_223638_322.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_223638_322.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_223924_819.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_223924_819.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_230031_055.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_230031_055.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_231109_916.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_231109_916.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_231812_202.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260218_231812_202.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_040927_980.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_040927_980.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_041136_197.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_041136_197.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_041416_454.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_041416_454.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_042138_932.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_042138_932.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_042442_141.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_042442_141.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_042818_112.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_042818_112.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_043305_271.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_043305_271.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_044412_235.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_044412_235.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_045754_752.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_045754_752.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_050407_887.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_050407_887.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_051331_717.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_051331_717.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_052213_419.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_052213_419.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_053024_148.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_053024_148.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_054134_921.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_054134_921.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_062651_963.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_062651_963.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_125544_695.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_125544_695.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_130051_037.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_130051_037.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_130918_645.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_130918_645.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_132647_465.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_132647_465.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_133412_910.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_133412_910.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_135819_918.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_135819_918.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_150502_074.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_150502_074.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_155717_582.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_155717_582.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_161142_147.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_161142_147.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_165553_975.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_165553_975.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_170238_853.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_170238_853.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_175457_100.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_175457_100.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_181750_110.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_181750_110.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_192152_659.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_192152_659.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_195248_407.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_195248_407.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_221800_464.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_221800_464.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_222234_124.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260219_222234_124.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_000835_253.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_000835_253.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_003445_040.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_003445_040.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_005150_729.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_005150_729.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_012343_724.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_012343_724.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_012658_651.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_012658_651.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_013059_080.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_013059_080.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_015158_537.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_015158_537.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_015519_983.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_015519_983.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_020446_424.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_020446_424.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_021641_418.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_021641_418.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_021943_131.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_021943_131.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_023857_876.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_023857_876.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_024323_517.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_024323_517.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_030325_331.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_030325_331.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_030807_173.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_030807_173.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_031803_560.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_031803_560.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_032337_608.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_032337_608.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_032648_390.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_032648_390.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_033353_411.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_033353_411.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_034706_039.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_034706_039.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_041215_016.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_041215_016.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_050951_136.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_050951_136.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_051219_533.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_051219_533.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_055936_676.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_055936_676.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_061922_179.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_061922_179.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_065606_294.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_065606_294.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_071040_693.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_071040_693.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_153452_774.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_153452_774.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_154107_257.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_154107_257.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_154350_558.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_154350_558.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_154740_450.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_154740_450.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_160300_814.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_160300_814.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_161032_672.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_161032_672.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_163551_548.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_163551_548.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_164640_058.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_164640_058.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_164939_062.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_164939_062.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_172726_326.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_172726_326.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_173240_917.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_173240_917.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_173759_448.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_173759_448.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_175908_852.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_175908_852.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_181449_714.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_181449_714.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_183330_271.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_183330_271.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_184456_630.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_184456_630.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_191350_475.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_191350_475.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_192614_667.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_192614_667.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_195720_731.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_195720_731.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_200234_469.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_200234_469.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_200713_011.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_200713_011.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_202259_232.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_202259_232.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_203635_093.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_203635_093.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_204219_129.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_204219_129.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_205544_718.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_205544_718.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_205722_084.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_205722_084.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_211512_430.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_211512_430.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_215054_986.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_215054_986.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_215722_233.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_215722_233.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_220515_373.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_220515_373.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_223757_858.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_223757_858.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_234347_654.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260220_234347_654.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_000252_032.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_000252_032.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_001543_032.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_001543_032.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_012552_697.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_012552_697.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_014133_270.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_014133_270.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_023043_169.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_023043_169.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_122922_547.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_122922_547.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_123211_099.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_123211_099.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_123413_980.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_123413_980.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_124519_245.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_124519_245.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_124654_823.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_124654_823.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_134219_732.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_134219_732.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_150430_606.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_150430_606.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_221916_452.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_221916_452.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_222210_765.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_222210_765.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_235310_146.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260221_235310_146.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_003221_327.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_003221_327.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_005310_505.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_005310_505.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_015310_757.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_015310_757.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_025310_574.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_025310_574.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_041920_691.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_041920_691.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_042725_180.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_042725_180.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_050259_125.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_050259_125.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_050625_429.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_050625_429.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_052206_015.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_052206_015.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_053615_138.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_053615_138.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_053923_164.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_053923_164.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_055138_269.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_055138_269.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_062228_181.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_062228_181.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_062941_551.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_062941_551.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_064113_848.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_064113_848.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_064413_019.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_064413_019.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_071721_891.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_071721_891.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_072229_350.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_072229_350.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_082229_439.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_082229_439.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_092229_725.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_092229_725.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_102229_631.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_102229_631.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_102551_772.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_102551_772.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_110009_263.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_110009_263.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_112229_665.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_112229_665.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_115431_950.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_115431_950.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_122230_270.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_122230_270.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_123227_130.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_123227_130.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_132230_384.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_132230_384.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_132445_644.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_132445_644.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_142230_381.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_142230_381.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_152937_500.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_152937_500.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_163844_678.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_163844_678.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_165426_128.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_165426_128.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_170002_397.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_170002_397.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_170152_124.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_170152_124.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_170555_393.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_170555_393.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_174141_981.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_174141_981.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_182447_767.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_182447_767.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_184328_178.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_184328_178.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_185125_907.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_185125_907.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_185618_214.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_185618_214.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_191300_964.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_191300_964.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_192227_375.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_192227_375.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_235558_146.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260222_235558_146.etl'"
+      },
+      {
+        "path": "C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260223_000056_213.etl",
+        "error": "EPERM: operation not permitted, unlink 'C:\\WINDOWS\\Logs\\waasmedic\\waasmedic.20260223_000056_213.etl'"
+      }
+    ],
+    "timeMs": 0
+  }
+}

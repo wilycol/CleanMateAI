@@ -1,0 +1,45 @@
+[
+  {
+    "role": "assistant",
+    "message": "Hola, gracias por iniciar el sistema CleanMate. Estamos aquí para ayudarte a optimizar y mejorar el rendimiento de tu sistema Windows. Para empezar, noto que tu sistema está funcionando con una carga muy alta en el procesador (CPU al 100%) y una cantidad significativa de memoria RAM en uso (85%). El disco también está cerca de su capacidad máxima, con solo 50 GB libres. Es importante realizar un análisis para entender mejor el estado actual de tu sistema y cómo podemos ayudarte a mejorar su rendimiento.",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": null
+  },
+  {
+    "role": "user",
+    "message": "Sí, está bien, perfecto. ¿Cómo hago ese análisis?",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T00:25:35.401Z"
+  },
+  {
+    "role": "assistant",
+    "message": "Excelente decisión. Para realizar el análisis, es importante que comprendas que este proceso revisará el estado actual de tu sistema, incluyendo el uso de CPU, RAM y disco, así como también buscará archivos y procesos que podrían estar consumiendo recursos de manera innecesaria. Este análisis es crucial para identificar áreas de mejora y optimización. Por favor, haz clic en el botón 'Ejecutar análisis' para comenzar.",
+    "actionSuggestion": {
+      "type": "analyze",
+      "label": "Ejecutar análisis",
+      "description": "Ejecutar análisis recomendado por el asistente"
+    },
+    "mode": "guided_flow",
+    "timestamp": "2026-02-23T00:25:42.713Z"
+  },
+  {
+    "role": "assistant",
+    "message": "✅ Acción \"Ejecutar análisis\" completada con éxito.",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": null
+  },
+  {
+    "role": "assistant",
+    "message": "No hay análisis previo. El sistema muestra un alto uso de recursos. Esto impacta el rendimiento general. Categorías relevantes: CPU, RAM y disco. Recomiendo ejecutar un análisis para obtener recomendaciones de optimización.",
+    "actionSuggestion": {
+      "type": "analyze",
+      "label": "Ejecutar análisis",
+      "description": "Ejecutar análisis recomendado por el asistente"
+    },
+    "mode": "guided_flow",
+    "timestamp": "2026-02-23T00:26:11.735Z"
+  }
+]

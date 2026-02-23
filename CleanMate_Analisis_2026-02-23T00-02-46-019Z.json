@@ -1,0 +1,12 @@
+{
+  "id": "1771804966019",
+  "timestamp": "2026-02-23T00:02:46.019Z",
+  "type": "analysis",
+  "stats": {
+    "spaceRecoverableMB": 63.06,
+    "fileCount": 454
+  },
+  "ai": {
+    "message": "No se pudo conectar con la IA. Verifique su conexión a internet."
+  }
+}
