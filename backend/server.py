@@ -28,6 +28,9 @@ load_state()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+_last_groq_body = None
+
+
 def _call_groq(messages, max_tokens=400, temperature=0.3, timeout=30):
     if not GROQ_API_KEY:
         raise RuntimeError("GROQ_API_KEY no configurada")
@@ -50,7 +53,12 @@ def _call_groq(messages, max_tokens=400, temperature=0.3, timeout=30):
         app.logger.error(f"Groq request timeout timeMs={response_time_ms}")
         raise RuntimeError("Groq timeout")
     response_time_ms = int((time.time() - started_at) * 1000)
-    app.logger.info(f"Groq response status={resp.status_code} timeMs={response_time_ms}")
+    body_text = resp.text or ""
+    body_len = len(body_text)
+    global _last_groq_body
+    _last_groq_body = body_text
+    app.logger.info(f"Groq response status={resp.status_code} timeMs={response_time_ms} bodyLen={body_len}")
+    app.logger.info(f"Groq raw body={body_text}")
     if resp.status_code == 200:
         data = resp.json()
         return data
@@ -268,6 +276,13 @@ def _run_chat_llm(user_message, context, session_state):
     print("CHAT SESSION STATE BEFORE LLM:")
     print(session_state)
     full_prompt, clinical_mode = _build_chat_context_and_prompt(user_message, context, session_state)
+    prompt_len_chars = len(full_prompt)
+    try:
+        prompt_len_words = len(full_prompt.split())
+    except Exception:
+        prompt_len_words = 0
+    approx_tokens = int(prompt_len_chars / 4) if prompt_len_chars else 0
+    app.logger.info(f"CHAT_LLM_PROMPT_METRICS clinical_mode={clinical_mode} promptLenChars={prompt_len_chars} promptLenWords={prompt_len_words} approxTokens={approx_tokens}")
     system_prompt = get_system_prompt(session_state)
 
     messages = [
@@ -358,6 +373,21 @@ def _run_chat_llm(user_message, context, session_state):
         }
         return payload, 200
     except Exception as e:
+        error_type = type(e).__name__
+        error_message = str(e)
+        cause = "unknown"
+        if "Groq timeout" in error_message:
+            cause = "timeout"
+        elif "Groq rate limit" in error_message:
+            cause = "status_429"
+        elif "Groq unauthorized" in error_message:
+            cause = "unauthorized"
+        elif "Groq server error" in error_message:
+            cause = "server_error"
+        app.logger.error(f"CHAT_LLM_EXCEPTION type={error_type} cause={cause} message={error_message}")
+        global _last_groq_body
+        if _last_groq_body is not None:
+            app.logger.error(f"CHAT_LLM_EXCEPTION GroqRawBody={_last_groq_body}")
         app.logger.error("Error en IA de chat (Groq)", exc_info=True)
         return {"error": "Error al consultar IA de chat", "details": str(e)}, 502
 
