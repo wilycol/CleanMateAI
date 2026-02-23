@@ -12,7 +12,14 @@ def _default_state():
     return {
         "last_analysis": None,
         "last_optimization": None,
-        "history": []
+        "history": [],
+        "compact_summary": "",
+        "compact_summary_hash": "",
+        "last_metrics": None,
+        "last_analysis_ts_snapshot": None,
+        "last_optimization_ts_snapshot": None,
+        "clinical_mode": None,
+        "confidence": None
     }
 
 
@@ -33,11 +40,10 @@ def load_state():
                 data = _default_state()
     except Exception:
         data = _default_state()
-    _state = {
-        "last_analysis": data.get("last_analysis"),
-        "last_optimization": data.get("last_optimization"),
-        "history": data.get("history") or []
-    }
+    for k, v in _default_state().items():
+        if k not in data:
+            data[k] = v
+    _state = data
     return _state
 
 

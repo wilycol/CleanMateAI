@@ -6,11 +6,12 @@ import json
 import time
 from datetime import datetime
 from dotenv import load_dotenv
+import hashlib
 
 try:
-    from .services.state_service import load_state, get_clinical_mode, update_last_analysis, update_last_optimization, append_history
+    from .services.state_service import load_state, save_state, get_clinical_mode, update_last_analysis, update_last_optimization, append_history
 except ImportError:
-    from services.state_service import load_state, get_clinical_mode, update_last_analysis, update_last_optimization, append_history
+    from services.state_service import load_state, save_state, get_clinical_mode, update_last_analysis, update_last_optimization, append_history
 
 try:
     from .ai.agent_prompt import get_system_prompt
@@ -191,58 +192,121 @@ def build_compact_clinical_context(state, messages):
         "recent_messages": recent_messages
     }
 
+def compute_summary_hash(summary: str) -> str:
+    return hashlib.sha256(summary.encode()).hexdigest()
+
+def generate_compact_summary(state: dict) -> str:
+    clinical_mode = state.get("clinical_mode") or get_clinical_mode()
+    confidence = state.get("confidence") or "unknown"
+    last_metrics = state.get("last_metrics") or {}
+    cpu = last_metrics.get("cpu")
+    ram = last_metrics.get("ram")
+    disk = last_metrics.get("disk")
+    freedMB = None
+    filesDeleted = None
+    spaceRecoverableMB = None
+    fileCount = None
+    risk_level = None
+
+    base = None
+    if state.get("last_optimization"):
+        base = state.get("last_optimization")
+    elif state.get("last_analysis"):
+        base = state.get("last_analysis")
+
+    if base and isinstance(base, dict):
+        summary_obj = base.get("summary") if isinstance(base.get("summary"), dict) else base
+        stats = summary_obj.get("stats") if isinstance(summary_obj.get("stats"), dict) else summary_obj
+        freedMB = stats.get("freedMB")
+        filesDeleted = stats.get("filesDeleted")
+        spaceRecoverableMB = stats.get("spaceRecoverableMB")
+        fileCount = stats.get("fileCount")
+        risk_level = summary_obj.get("risk_level")
+        if risk_level is None and isinstance(base.get("summary"), dict):
+            risk_level = base["summary"].get("risk_level")
+
+    lines = []
+    lines.append(f"Mode: {clinical_mode}")
+    lines.append(f"Confidence: {confidence}")
+    if cpu is not None and ram is not None and disk is not None:
+        lines.append(f"System Metrics: CPU {cpu}%, RAM {ram}%, Disk {disk}%")
+    if spaceRecoverableMB is not None or fileCount is not None:
+        lines.append(f"Analysis: {spaceRecoverableMB or 0}MB recoverable, {fileCount or 0} files")
+    if freedMB is not None or filesDeleted is not None:
+        lines.append(f"Optimization: {freedMB or 0}MB freed, {filesDeleted or 0} files")
+    if risk_level:
+        lines.append(f"Risk Level: {risk_level}")
+    if len(lines) > 6:
+        lines = lines[:6]
+    summary = " | ".join(lines)
+    words = summary.split()
+    if len(words) > 180:
+        summary = " ".join(words[:180])
+    return summary
+
+def should_regenerate_summary(state, new_metrics) -> bool:
+    prev_metrics = state.get("last_metrics") or {}
+    clinical_mode_now = get_clinical_mode()
+    if clinical_mode_now != (state.get("clinical_mode") or clinical_mode_now):
+        return True
+    if (state.get("confidence") or "unknown") != (state.get("confidence") or "unknown"):
+        pass
+    if prev_metrics.get("cpu") != new_metrics.get("cpu"):
+        return True
+    if prev_metrics.get("ram") != new_metrics.get("ram"):
+        return True
+    if prev_metrics.get("disk") != new_metrics.get("disk"):
+        return True
+    prev_an_ts = state.get("last_analysis_ts_snapshot")
+    prev_op_ts = state.get("last_optimization_ts_snapshot")
+    cur_an_ts = (state.get("last_analysis") or {}).get("timestamp")
+    cur_op_ts = (state.get("last_optimization") or {}).get("timestamp")
+    if prev_an_ts != cur_an_ts:
+        return True
+    if prev_op_ts != cur_op_ts:
+        return True
+    return False
+
 def _build_chat_context_and_prompt(user_message, context, session_state):
     system_metrics = context.get("systemMetrics", {})
     state = load_state() or {}
     clinical_mode = get_clinical_mode()
+    state["clinical_mode"] = clinical_mode
+    if not state.get("confidence"):
+        state["confidence"] = "unknown"
 
     cpu = system_metrics.get("cpuLoad")
     ram = system_metrics.get("ramUsed")
     disk = system_metrics.get("diskUsed")
     disk_free = system_metrics.get("diskFreeGB")
-
-    metrics_parts = []
-    if cpu is not None:
-        metrics_parts.append(f"CPU {cpu}%")
-    if ram is not None:
-        metrics_parts.append(f"RAM {ram}%")
-    if disk is not None:
-        metrics_parts.append(f"Disco {disk}%")
-    if disk_free is not None:
-        metrics_parts.append(f"EspacioLibre {disk_free}GB")
-    metrics_summary = ", ".join(metrics_parts) if metrics_parts else "Sin métricas recientes"
-
-    last_analysis = state.get("last_analysis") or {}
-    last_optimization = state.get("last_optimization") or {}
-
-    analysis_tag = "sin análisis"
-    if last_analysis:
-        stats = last_analysis.get("stats") or {}
-        analysis_tag = f"último análisis: {stats.get('spaceRecoverableMB', 'N/A')}MB recuperables, {stats.get('fileCount', 'N/A')} archivos"
-
-    optimization_tag = "sin optimización"
-    if last_optimization:
-        stats = last_optimization.get("stats") or last_optimization
-        optimization_tag = f"última optimización: {stats.get('freedMB', 'N/A')}MB liberados, {stats.get('filesDeleted', 'N/A')} archivos"
-
-    compact_state = {
-        "mode": session_state.get("mode"),
-        "clinical_mode": clinical_mode,
-        "confidence": state.get("confidence") or "unknown",
-        "compact_summary": f"{metrics_summary}; {analysis_tag}; {optimization_tag}",
-        "active_factors": []
+    metrics_snapshot = {
+        "cpu": cpu,
+        "ram": ram,
+        "disk": disk,
+        "disk_free": disk_free,
+        "timestamp": datetime.utcnow().isoformat() + "Z"
     }
+    if should_regenerate_summary(state, metrics_snapshot):
+        state["last_metrics"] = metrics_snapshot
+        summary_text = generate_compact_summary(state)
+        summary_hash = compute_summary_hash(summary_text)
+        state["compact_summary"] = summary_text
+        state["compact_summary_hash"] = summary_hash
+        state["last_analysis_ts_snapshot"] = (state.get("last_analysis") or {}).get("timestamp")
+        state["last_optimization_ts_snapshot"] = (state.get("last_optimization") or {}).get("timestamp")
+        save_state(state)
+    else:
+        state["last_metrics"] = metrics_snapshot
+        save_state(state)
 
     messages = context.get("recentMessages") or []
-    compact_context = build_compact_clinical_context(compact_state, messages)
-
-    full_prompt = f"""
-CLINICAL_CONTEXT:
-{json.dumps(compact_context, ensure_ascii=False)}
-
-USER_MESSAGE:
-{user_message}
-"""
+    compact_context = {
+        "clinical_mode": state.get("clinical_mode"),
+        "confidence": state.get("confidence"),
+        "compact_summary": state.get("compact_summary") or generate_compact_summary(state),
+        "recent_messages": (messages or [])[-6:]
+    }
+    full_prompt = json.dumps(compact_context, ensure_ascii=False)
 
     return full_prompt, clinical_mode
 
@@ -272,6 +336,19 @@ def _run_chat_llm(user_message, context, session_state):
         prompt_len_words = 0
     approx_tokens = int(prompt_len_chars / 4) if prompt_len_chars else 0
     app.logger.info(f"CHAT_LLM_PROMPT_METRICS clinical_mode={clinical_mode} promptLenChars={prompt_len_chars} promptLenWords={prompt_len_words} approxTokens={approx_tokens}")
+    if approx_tokens > 8000:
+        app.logger.warning(f"CHAT_LLM_ABORT due to token estimate {approx_tokens}")
+        safe_payload = {
+            "message": "La solicitud fue bloqueada por tamaño excesivo del prompt.",
+            "nextAction": {
+                "type": "none",
+                "label": "",
+                "autoExecute": False
+            },
+            "mode": session_state.get("mode"),
+            "sessionState": session_state
+        }
+        return safe_payload, 200
     system_prompt = get_system_prompt(session_state)
 
     messages = [
@@ -279,6 +356,7 @@ def _run_chat_llm(user_message, context, session_state):
         {"role": "user", "content": full_prompt}
     ]
     messages = messages[-6:]
+
 
     if not GROQ_API_KEY:
         return {"error": "Servidor sin clave de IA configurada (Groq_API_KEY ausente)"}, 500
