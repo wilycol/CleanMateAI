@@ -65,14 +65,9 @@ function createWindow() {
         mainWindow.loadURL('http://localhost:5173');
         mainWindow.webContents.openDevTools({ mode: 'detach' });
     } else {
-        // Updated path to match new 'build_output_clean' build output directory
         const indexPath = path.join(__dirname, '../build_output_clean/index.html');
         log.info(`Loading production file from: ${indexPath}`);
-        
         mainWindow.loadFile(indexPath).catch(e => log.error('Failed to load index.html', e));
-        
-        // Open DevTools even in production to debug the black screen
-        mainWindow.webContents.openDevTools({ mode: 'detach' });
     }
 
     mainWindow.on('close', (event) => {
