@@ -2,6 +2,28 @@ def get_system_prompt(session_state):
     mode = session_state.get("mode", "guided_flow")
     clinical_mode = session_state.get("clinicalMode") or "needs_analysis"
     flow_completed = bool(session_state.get("flowCompleted"))
+    phase = session_state.get("phase") or ("idle_consult" if flow_completed else "analysis")
+
+    extra = ""
+    if phase == "post_optimization":
+        extra = """
+
+FASE ACTUAL: POST_OPTIMIZATION
+El sistema ya fue analizado y optimizado.
+No sugieras automáticamente nuevos análisis ni nuevas optimizaciones.
+Responde como un experto consultor.
+Solo sugiere nuevas acciones si el usuario las pide explícitamente.
+"""
+    elif phase == "idle_consult":
+        extra = """
+
+FASE ACTUAL: IDLE_CONSULT
+El usuario está cerrando la sesión.
+Proporciona una despedida profesional, breve y clara.
+No hagas preguntas de seguimiento.
+No sugieras nuevas acciones ni análisis.
+Mantén la respuesta por debajo de 120 tokens.
+"""
 
     base = f"""
 Eres el Doctor clínico del sistema CleanMate.
@@ -39,10 +61,13 @@ Nunca omitas "nextAction".
 Nunca cambies los nombres de los campos.
 Nunca devuelvas texto fuera del JSON.
 
+{extra}
+
 Contexto de sesión:
 SESSION_MODE: {mode}
 CLINICAL_MODE: {clinical_mode}
 FLOW_COMPLETED: {flow_completed}
+PHASE: {phase}
 
 REGLAS DE FLUJO OBLIGATORIAS:
 

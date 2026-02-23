@@ -23,6 +23,17 @@ def _build_session_state(session_id, state=None):
     base["mode"] = mode
     base["clinicalMode"] = clinical_mode
     base["flowCompleted"] = flow_completed
+    phase = base.get("phase")
+    if not phase:
+        if clinical_mode == "needs_analysis":
+            phase = "analysis"
+        elif clinical_mode == "needs_optimization":
+            phase = "optimization"
+        elif clinical_mode in ["stable", "maintenance_due"]:
+            phase = "post_optimization"
+        else:
+            phase = "analysis"
+    base["phase"] = phase
     base["updatedAt"] = now
     if "createdAt" not in base:
         base["createdAt"] = now

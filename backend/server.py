@@ -30,6 +30,16 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 _last_groq_body = None
+CLOSING_INTENTS = [
+    "gracias",
+    "eso es todo",
+    "ok es todo",
+    "listo",
+    "perfecto gracias",
+    "muchas gracias",
+    "hasta luego",
+    "chao"
+]
 
 
 def _call_groq(messages, max_tokens=400, temperature=0.3, timeout=30):
@@ -328,6 +338,11 @@ def _run_chat_llm(user_message, context, session_state):
             "sessionState": session_state
         }
         return safe_payload, 200
+    msg_lower = (user_message or "").lower()
+    for token in CLOSING_INTENTS:
+        if token in msg_lower:
+            session_state["phase"] = "idle_consult"
+            break
     full_prompt, clinical_mode = _build_chat_context_and_prompt(user_message, context, session_state)
     prompt_len_chars = len(full_prompt)
     try:
@@ -361,8 +376,9 @@ def _run_chat_llm(user_message, context, session_state):
     if not GROQ_API_KEY:
         return {"error": "Servidor sin clave de IA configurada (Groq_API_KEY ausente)"}, 500
 
+    max_tokens = 120 if session_state.get("phase") == "idle_consult" else 200
     try:
-        raw = _call_groq(messages, max_tokens=200)
+        raw = _call_groq(messages, max_tokens=max_tokens)
         choice = (raw.get("choices") or [{}])[0]
         msg = (choice.get("message") or {})
         content = msg.get("content") or ""
