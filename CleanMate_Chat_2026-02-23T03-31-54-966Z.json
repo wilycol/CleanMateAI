@@ -1,0 +1,71 @@
+[
+  {
+    "role": "user",
+    "message": "ok analizar",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T03:29:48.860Z"
+  },
+  {
+    "role": "assistant",
+    "message": "Excelente decisión. Comenzaremos el análisis del sistema para identificar posibles cuellos de botella y áreas de mejora. Esto puede tomar unos minutos. Por favor, espere mientras se ejecuta el análisis.",
+    "actionSuggestion": {
+      "type": "analyze",
+      "label": "Ejecutar análisis",
+      "description": "Ejecutar análisis recomendado por el asistente"
+    },
+    "mode": "guided_flow",
+    "timestamp": "2026-02-23T03:29:50.240Z"
+  },
+  {
+    "role": "user",
+    "message": "Resume el ÚLTIMO ANÁLISIS del sistema en 4 líneas máximo: 1) síntesis del hallazgo, 2) impacto, 3) categorías relevantes, 4) si recomiendas optimizar ahora. Sé muy conciso.",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T03:30:09.992Z"
+  },
+  {
+    "role": "assistant",
+    "message": "El sistema está funcionando con alta carga. El impacto es un rendimiento disminuido. Las categorías relevantes son CPU, RAM y disco. Recomiendo optimizar ahora.",
+    "actionSuggestion": {
+      "type": "clean",
+      "targets": [
+        "temp",
+        "cache_chrome",
+        "cache_edge"
+      ],
+      "label": "Ejecutar optimización",
+      "description": "Ejecutar optimización recomendada por el asistente"
+    },
+    "mode": "guided_flow",
+    "timestamp": "2026-02-23T03:30:11.189Z"
+  },
+  {
+    "role": "user",
+    "message": "Resume la ÚLTIMA OPTIMIZACIÓN ejecutada en 3 líneas máximo: 1) espacio liberado y archivos, 2) cambios relevantes, 3) siguiente paso recomendado. Sé muy conciso.",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T03:30:34.457Z"
+  },
+  {
+    "role": "assistant",
+    "message": "No se pudo conectar con la IA de chat. Verifique su conexión a internet.",
+    "actionSuggestion": null,
+    "mode": "CONVERSATION",
+    "timestamp": "2026-02-23T03:30:35.205Z"
+  },
+  {
+    "role": "user",
+    "message": "disculpa",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T03:31:25.500Z"
+  },
+  {
+    "role": "assistant",
+    "message": "No se pudo conectar con la IA de chat. Verifique su conexión a internet.",
+    "actionSuggestion": null,
+    "mode": "CONVERSATION",
+    "timestamp": "2026-02-23T03:31:30.116Z"
+  }
+]
