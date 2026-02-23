@@ -14,6 +14,7 @@ let chatSessionId = null;
 async function analyzeSystem(systemStats, cleanupStats) {
     try {
         log.info('Sending report to AI backend...');
+        const startedAt = Date.now();
         const payload = {
             system_info: {
                 cpu: systemStats.cpu,
@@ -27,8 +28,9 @@ async function analyzeSystem(systemStats, cleanupStats) {
             }
         };
 
-        const response = await axios.post(API_ANALYZE_URL, payload, { timeout: 8000 });
-        log.info('AI Response received successfully');
+        const response = await axios.post(API_ANALYZE_URL, payload, { timeout: 30000 });
+        const responseTimeMs = Date.now() - startedAt;
+        log.info(`AI analyze response received successfully in ${responseTimeMs}ms`);
         return response.data;
     } catch (error) {
         log.error('API Error:', error.message);
@@ -52,10 +54,13 @@ async function chatWithAI(message, context) {
     try {
         log.info('Sending chat to AI backend...');
         if (!chatSessionId) {
-            const startRes = await axios.post(API_CHAT_START_URL, {}, { timeout: 5000 });
+            const chatStartStartedAt = Date.now();
+            const startRes = await axios.post(API_CHAT_START_URL, {}, { timeout: 30000 });
             if (startRes && startRes.data && startRes.data.sessionId) {
                 chatSessionId = startRes.data.sessionId;
             }
+            const chatStartResponseTimeMs = Date.now() - chatStartStartedAt;
+            log.info(`Chat session start response received in ${chatStartResponseTimeMs}ms`);
         }
 
         const payload = {
@@ -64,8 +69,10 @@ async function chatWithAI(message, context) {
             context
         };
 
-        const response = await axios.post(API_CHAT_MESSAGE_URL, payload, { timeout: 8000 });
-        log.info('Chat AI response received successfully');
+        const chatMessageStartedAt = Date.now();
+        const response = await axios.post(API_CHAT_MESSAGE_URL, payload, { timeout: 30000 });
+        const chatMessageResponseTimeMs = Date.now() - chatMessageStartedAt;
+        log.info(`Chat AI response received successfully in ${chatMessageResponseTimeMs}ms`);
         return response.data;
     } catch (error) {
         log.error('Chat API Error:', error.message);

@@ -3,6 +3,7 @@ from flask_cors import CORS
 import os
 import requests
 import json
+import time
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -27,7 +28,7 @@ load_state()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-def _call_groq(messages, max_tokens=400, temperature=0.3, timeout=10):
+def _call_groq(messages, max_tokens=400, temperature=0.3, timeout=30):
     if not GROQ_API_KEY:
         raise RuntimeError("GROQ_API_KEY no configurada")
     app.logger.info(f"Groq request endpoint={GROQ_URL} model={GROQ_MODEL}")
@@ -41,12 +42,20 @@ def _call_groq(messages, max_tokens=400, temperature=0.3, timeout=10):
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
     }
-    resp = requests.post(GROQ_URL, json=payload, headers=headers, timeout=timeout)
-    app.logger.info(f"Groq response status={resp.status_code}")
+    started_at = time.time()
+    try:
+        resp = requests.post(GROQ_URL, json=payload, headers=headers, timeout=timeout)
+    except requests.exceptions.Timeout:
+        response_time_ms = int((time.time() - started_at) * 1000)
+        app.logger.error(f"Groq request timeout timeMs={response_time_ms}")
+        raise RuntimeError("Groq timeout")
+    response_time_ms = int((time.time() - started_at) * 1000)
+    app.logger.info(f"Groq response status={resp.status_code} timeMs={response_time_ms}")
     if resp.status_code == 200:
         data = resp.json()
         return data
     if resp.status_code == 429:
+        app.logger.warning(f"Groq 429 body={resp.text}")
         raise RuntimeError("Groq rate limit (429)")
     if resp.status_code == 401:
         raise RuntimeError("Groq unauthorized (401)")
