@@ -1,0 +1,113 @@
+[
+  {
+    "role": "user",
+    "message": "si",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T01:37:44.819Z"
+  },
+  {
+    "role": "assistant",
+    "message": "Excelente, vamos a comenzar el análisis de su sistema. El análisis permitirá identificar posibles problemas y áreas de mejora en el rendimiento de su sistema. Esto incluye evaluar el uso de la CPU, la memoria RAM y el espacio en disco. Con esta información, podremos determinar los pasos necesarios para optimizar el sistema.",
+    "actionSuggestion": {
+      "type": "analyze",
+      "label": "Ejecutar análisis",
+      "description": "Ejecutar análisis recomendado por el asistente"
+    },
+    "mode": "guided_flow",
+    "timestamp": "2026-02-23T01:37:46.082Z"
+  },
+  {
+    "role": "user",
+    "message": "Resume el ÚLTIMO ANÁLISIS del sistema en 4 líneas máximo: 1) síntesis del hallazgo, 2) impacto, 3) categorías relevantes, 4) si recomiendas optimizar ahora. Sé muy conciso.",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T01:38:04.734Z"
+  },
+  {
+    "role": "assistant",
+    "message": "Síntesis: El sistema está sobrecargado. Impacto: Rendimiento reducido. Categorías: CPU, RAM y disco. Recomendación: Optimizar ahora.",
+    "actionSuggestion": {
+      "type": "clean",
+      "targets": [
+        "temp",
+        "cache_chrome",
+        "cache_edge"
+      ],
+      "label": "Ejecutar optimización",
+      "description": "Ejecutar optimización recomendada por el asistente"
+    },
+    "mode": "guided_flow",
+    "timestamp": "2026-02-23T01:38:05.620Z"
+  },
+  {
+    "role": "user",
+    "message": "Resume la ÚLTIMA OPTIMIZACIÓN ejecutada en 3 líneas máximo: 1) espacio liberado y archivos, 2) cambios relevantes, 3) siguiente paso recomendado. Sé muy conciso.",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T01:38:19.226Z"
+  },
+  {
+    "role": "assistant",
+    "message": "No se pudo conectar con la IA de chat. Verifique su conexión a internet.",
+    "actionSuggestion": null,
+    "mode": "CONVERSATION",
+    "timestamp": "2026-02-23T01:38:20.152Z"
+  },
+  {
+    "role": "user",
+    "message": "¿Qué sucedió? Cuéntame cuál fue el resultado de la optimización. ¿Puedes darme un resumen de lo que fue el análisis y la optimización?",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T01:50:24.252Z"
+  },
+  {
+    "role": "assistant",
+    "message": "No se pudo conectar con la IA de chat. Verifique su conexión a internet.",
+    "actionSuggestion": null,
+    "mode": "CONVERSATION",
+    "timestamp": "2026-02-23T01:50:25.855Z"
+  },
+  {
+    "role": "user",
+    "message": "Dame un resumen corto de la optimización",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T01:50:47.958Z"
+  },
+  {
+    "role": "assistant",
+    "message": "No se pudo conectar con la IA de chat. Verifique su conexión a internet.",
+    "actionSuggestion": null,
+    "mode": "CONVERSATION",
+    "timestamp": "2026-02-23T01:50:48.975Z"
+  },
+  {
+    "role": "user",
+    "message": "¿Tienes problemas de conexión? ¿Me puedes dar un resumen corto de la optimización? ¿Cuál fue el resultado del reporte?",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T01:52:16.171Z"
+  },
+  {
+    "role": "assistant",
+    "message": "No se pudo conectar con la IA de chat. Verifique su conexión a internet.",
+    "actionSuggestion": null,
+    "mode": "CONVERSATION",
+    "timestamp": "2026-02-23T01:52:17.253Z"
+  },
+  {
+    "role": "user",
+    "message": "¿Ya tienes conexión nuevamente? ¿Me puedes dar un reporte corto de 5 líneas o 10 De la optimización.",
+    "actionSuggestion": null,
+    "mode": null,
+    "timestamp": "2026-02-23T01:56:23.618Z"
+  },
+  {
+    "role": "assistant",
+    "message": "No se pudo conectar con la IA de chat. Verifique su conexión a internet.",
+    "actionSuggestion": null,
+    "mode": "CONVERSATION",
+    "timestamp": "2026-02-23T01:56:24.639Z"
+  }
+]
