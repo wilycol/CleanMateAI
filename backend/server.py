@@ -80,39 +80,41 @@ def analyze_system():
         return jsonify({"error": "Datos inválidos"}), 400
 
     try:
-        system_info = data.get('system_info', {})
-        cleanup_info = data.get('cleanup_info', {})
-        
-        prompt_content = f"""
-        Analiza el siguiente estado del sistema y proporciona recomendaciones breves:
-        
-        CPU: {system_info.get('cpu', 'N/A')}%
-        RAM: {system_info.get('ram_percent', 'N/A')}%
-        Disco: {system_info.get('disk_percent', 'N/A')}%
-        
-        Última limpieza: {cleanup_info.get('last_cleanup', 'Nunca')}
-        """
+        system_info = data.get('system_info', {}) or {}
+        cleanup_info = data.get('cleanup_info', {}) or {}
 
-        messages = [
-            {
-                "role": "system",
-                "content": "Eres CleanMateAI, un experto en mantenimiento de Windows. Responde en español, breve y conciso."
-            },
-            {
-                "role": "user",
-                "content": prompt_content
-            }
-        ]
+        cpu = system_info.get('cpu')
+        ram = system_info.get('ram_percent')
+        disk = system_info.get('disk_percent')
 
-        if GROQ_API_KEY:
-            try:
-                data = _call_groq(messages, max_tokens=180)
-                return jsonify(data)
-            except Exception as e:
-                app.logger.error("Error en IA de análisis (Groq)", exc_info=True)
-                return jsonify({"error": "Error al consultar IA de análisis", "details": str(e)}), 502
+        status_parts = []
+        if cpu is not None:
+            status_parts.append(f"CPU {cpu}%")
+        if ram is not None:
+            status_parts.append(f"RAM {ram}%")
+        if disk is not None:
+            status_parts.append(f"Disco {disk}%")
+        status_text = ", ".join(status_parts) if status_parts else "sin métricas claras"
 
-        return jsonify({"error": "Servidor sin clave de IA configurada (Groq_API_KEY ausente)"}), 500
+        freed_mb = cleanup_info.get('freed_mb')
+        files_deleted = cleanup_info.get('files_deleted')
+        cleanup_summary = ""
+        if freed_mb is not None or files_deleted is not None:
+            cleanup_summary = f" Limpieza reciente: liberados {freed_mb or 0} MB en {files_deleted or 0} elementos."
+
+        message_text = f"Estado actual: {status_text}.{cleanup_summary} Se recomienda revisar procesos en segundo plano y considerar una optimización si percibes lentitud."
+
+        response_payload = {
+            "choices": [
+                {
+                    "message": {
+                        "content": message_text
+                    }
+                }
+            ]
+        }
+
+        return jsonify(response_payload), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -171,100 +173,74 @@ def system_executed():
     print("===========================================")
     return jsonify({"status": "ok"}), 201
 
+
+def build_compact_clinical_context(state, messages):
+    clinical_mode = state.get("clinical_mode") or state.get("mode") or get_clinical_mode()
+    confidence = state.get("confidence") or "unknown"
+    compact_summary = state.get("compact_summary") or ""
+    active_factors = state.get("active_factors") or []
+    if not isinstance(active_factors, list):
+        active_factors = [str(active_factors)]
+    active_factors = active_factors[:5]
+    recent_messages = (messages or [])[-6:]
+    return {
+        "clinical_mode": clinical_mode,
+        "confidence": confidence,
+        "summary": compact_summary,
+        "active_factors": active_factors,
+        "recent_messages": recent_messages
+    }
+
 def _build_chat_context_and_prompt(user_message, context, session_state):
     system_metrics = context.get("systemMetrics", {})
-
-    cpu = system_metrics.get("cpuLoad", "N/A")
-    ram = system_metrics.get("ramUsed", "N/A")
-    disk = system_metrics.get("diskUsed", "N/A")
-    disk_free = system_metrics.get("diskFreeGB", "N/A")
-
-    state = load_state()
+    state = load_state() or {}
     clinical_mode = get_clinical_mode()
 
-    last_analysis = state.get("last_analysis")
-    last_optimization = state.get("last_optimization")
-    history = state.get("history") or []
-    last_event = history[-1] if history else None
+    cpu = system_metrics.get("cpuLoad")
+    ram = system_metrics.get("ramUsed")
+    disk = system_metrics.get("diskUsed")
+    disk_free = system_metrics.get("diskFreeGB")
 
-    analysis_summary = "None"
-    analysis_timestamp = "None"
+    metrics_parts = []
+    if cpu is not None:
+        metrics_parts.append(f"CPU {cpu}%")
+    if ram is not None:
+        metrics_parts.append(f"RAM {ram}%")
+    if disk is not None:
+        metrics_parts.append(f"Disco {disk}%")
+    if disk_free is not None:
+        metrics_parts.append(f"EspacioLibre {disk_free}GB")
+    metrics_summary = ", ".join(metrics_parts) if metrics_parts else "Sin métricas recientes"
+
+    last_analysis = state.get("last_analysis") or {}
+    last_optimization = state.get("last_optimization") or {}
+
+    analysis_tag = "sin análisis"
     if last_analysis:
-        analysis_summary = json.dumps(last_analysis.get("summary") or {}, ensure_ascii=False)
-        analysis_timestamp = last_analysis.get("timestamp") or "None"
+        stats = last_analysis.get("stats") or {}
+        analysis_tag = f"último análisis: {stats.get('spaceRecoverableMB', 'N/A')}MB recuperables, {stats.get('fileCount', 'N/A')} archivos"
 
-    optimization_summary = "None"
-    optimization_timestamp = "None"
+    optimization_tag = "sin optimización"
     if last_optimization:
-        optimization_summary = json.dumps(last_optimization.get("summary") or {}, ensure_ascii=False)
-        optimization_timestamp = last_optimization.get("timestamp") or "None"
+        stats = last_optimization.get("stats") or last_optimization
+        optimization_tag = f"última optimización: {stats.get('freedMB', 'N/A')}MB liberados, {stats.get('filesDeleted', 'N/A')} archivos"
 
-    last_event_summary = "None"
-    if last_event:
-        last_event_summary = json.dumps(last_event, ensure_ascii=False)
+    compact_state = {
+        "mode": session_state.get("mode"),
+        "clinical_mode": clinical_mode,
+        "confidence": state.get("confidence") or "unknown",
+        "compact_summary": f"{metrics_summary}; {analysis_tag}; {optimization_tag}",
+        "active_factors": []
+    }
 
-    reports = context.get("reports", []) or []
-    latest_analysis = next((r for r in reports if r.get("type") == "analysis"), None)
-    latest_cleanup = next((r for r in reports if r.get("type") == "cleanup"), None)
-
-    analysis_details = "None"
-    if latest_analysis:
-        stats = latest_analysis.get("stats", {}) or {}
-        ai_msg = (latest_analysis.get("ai", {}) or {}).get("message")
-        ai_excerpt = (ai_msg or "")[:280] if ai_msg else "N/A"
-        analysis_details = (
-            f"spaceRecoverableMB={stats.get('spaceRecoverableMB', 'N/A')}, "
-            f"fileCount={stats.get('fileCount', 'N/A')}, "
-            f"aiExcerpt={ai_excerpt}"
-        )
-
-    cleanup_details = "None"
-    if latest_cleanup:
-        stats = latest_cleanup.get("stats", {}) or latest_cleanup
-        cleanup_details = (
-            f"freedMB={stats.get('freedMB', 'N/A')}, "
-            f"filesDeleted={stats.get('filesDeleted', 'N/A')}"
-        )
-
-    context_text = f"""
-SESSION MODE:
-{session_state.get("mode")}
-
-CLINICAL MODE:
-{clinical_mode}
-
-CURRENT METRICS:
-CPU: {cpu}%
-RAM: {ram}%
-Disk: {disk}%
-DiskFreeGB: {disk_free}
-
-LAST ANALYSIS REPORT:
-{analysis_summary}
-
-LAST ANALYSIS TIMESTAMP:
-{analysis_timestamp}
-
-LAST OPTIMIZATION REPORT:
-{optimization_summary}
-
-LAST OPTIMIZATION TIMESTAMP:
-{optimization_timestamp}
-
-LAST EVENT:
-{last_event_summary}
-
-ANALYSIS HISTORY (latest):
-{analysis_details}
-
-OPTIMIZATION HISTORY (latest):
-{cleanup_details}
-"""
+    messages = context.get("recentMessages") or []
+    compact_context = build_compact_clinical_context(compact_state, messages)
 
     full_prompt = f"""
-{context_text}
+CLINICAL_CONTEXT:
+{json.dumps(compact_context, ensure_ascii=False)}
 
-USER MESSAGE:
+USER_MESSAGE:
 {user_message}
 """
 
@@ -275,6 +251,19 @@ def _run_chat_llm(user_message, context, session_state):
     session_state = touch_session(session_state.get("id"))
     print("CHAT SESSION STATE BEFORE LLM:")
     print(session_state)
+    guide_chat_active = context.get("guide_chat_active")
+    if guide_chat_active is False:
+        safe_payload = {
+            "message": "El chat guiado está desactivado actualmente.",
+            "nextAction": {
+                "type": "none",
+                "label": "",
+                "autoExecute": False
+            },
+            "mode": session_state.get("mode"),
+            "sessionState": session_state
+        }
+        return safe_payload, 200
     full_prompt, clinical_mode = _build_chat_context_and_prompt(user_message, context, session_state)
     prompt_len_chars = len(full_prompt)
     try:
@@ -289,6 +278,7 @@ def _run_chat_llm(user_message, context, session_state):
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": full_prompt}
     ]
+    messages = messages[-6:]
 
     if not GROQ_API_KEY:
         return {"error": "Servidor sin clave de IA configurada (Groq_API_KEY ausente)"}, 500
@@ -441,12 +431,9 @@ def chat_session(session_id):
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    data = request.json or {}
-    user_message = data.get("message", "")
-    context = data.get("context", {})
-    session_state = create_session()
-    payload, status_code = _run_chat_llm(user_message, context, session_state)
-    return jsonify(payload), status_code
+    return jsonify({
+        "error": "Endpoint /api/chat deprecado. Usa /api/chat/message con sesión guiada."
+    }), 410
 
 @app.route('/api/ai-health', methods=['GET'])
 def ai_health():
