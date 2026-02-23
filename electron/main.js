@@ -393,6 +393,13 @@ app.whenReady().then(() => {
             } catch (e) {
                 log.error('Failed to save analysis report (chat action):', e);
             }
+            try {
+                console.log('Calling SYSTEM EXECUTED with:', finalResult);
+                log.info('NOTIFY SYSTEM EXECUTED CALLED (chat analyze)', { type: 'analyze', report: finalResult });
+                await notifySystemExecuted('analyze', finalResult);
+            } catch (e) {
+                log.error('Failed to notify backend system_executed (chat analyze):', e);
+            }
             return { success: true, result: finalResult };
 
         } else if (action.type === 'clean') {
@@ -402,23 +409,25 @@ app.whenReady().then(() => {
                 }
             };
             const result = await cleanSystem(onProgress);
-            updateLastCleanup(result);
+            const finalResult = result;
+            updateLastCleanup(finalResult);
             // Save cleanup report for immediate context availability
             try {
                 await saveReport({
                     type: 'cleanup',
-                    stats: result
+                    stats: finalResult
                 });
             } catch (e) {
                 log.error('Failed to save cleanup report (chat action):', e);
             }
             try {
-                log.info('NOTIFY SYSTEM EXECUTED CALLED', { type: 'optimize', report: result });
-                await notifySystemExecuted('optimize', result);
+                console.log('Calling SYSTEM EXECUTED with:', finalResult);
+                log.info('NOTIFY SYSTEM EXECUTED CALLED (chat clean)', { type: 'optimize', report: finalResult });
+                await notifySystemExecuted('optimize', finalResult);
             } catch (e) {
                 log.error('Failed to notify backend system_executed (chat cleanup):', e);
             }
-            return { success: true, result };
+            return { success: true, result: finalResult };
         }
         
         return { success: false, message: "Action type not implemented yet" };
